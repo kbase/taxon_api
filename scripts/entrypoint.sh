@@ -2,7 +2,17 @@
 
 . /kb/deployment/user-env.sh
 
+if [ ! -e ./work/config.properties ] ; then
+cat << EOF >> ./work/config.properties
+[global]
+kbase_endpoint=$KBASE_ENDPOINT
+job_service_url = $KBASE_ENDPOINT/userandjobstate
+workspace_url = $KBASE_ENDPOINT/ws
+shock_url =  $KBASE_ENDPOINT/shock-api
+EOF
+fi
 python ./scripts/prepare_deploy_cfg.py ./deploy.cfg ./work/config.properties
+
 
 if [ -f ./work/token ] ; then
   export KB_AUTH_TOKEN=$(<./work/token)
