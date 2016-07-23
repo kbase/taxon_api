@@ -26,4 +26,6 @@ RUN make all
 
 ENTRYPOINT [ "./scripts/entrypoint.sh" ]
 
+EXPOSE 5000
+
 CMD [ ]
