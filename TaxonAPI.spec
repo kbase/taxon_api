@@ -4,6 +4,9 @@ A KBase module: TaxonAPI
 
 module TaxonAPI {
 
+/* A boolean. 0 = false, other = true. */
+typedef int boolean;
+
 typedef string ObjectReference;
 
 /** @skip documentation */
@@ -164,5 +167,46 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
      * @skip documentation
      */
      funcdef get_version( ObjectReference ref)  returns (string) authentication required;
+
+
+     typedef structure {
+        ObjectReference ref;
+        boolean include_decorated_scientific_lineage;
+     } GetAllDataParams;
+
+     typedef structure {
+        ObjectReference parent;
+        list<ObjectReference> children;
+        list<string> scientific_lineage;
+        list<string> decorated_scientific_lineage;
+        string scientific_name;
+        int taxonomic_id;
+        string kingdom;
+        string domain;
+        int genetic_code;
+        list <string> aliases;
+
+        ObjectInfo obj_info;
+     } TaxonData;
+
+     funcdef get_all_data( GetAllDataParams params )
+                    returns (TaxonData d) authentication required;
+
+    typedef structure {
+        ObjectReference ref;
+     } GetDecoratedScientificLineageParams;
+
+     typedef structure {
+        ObjectReference ref;
+        string scientific_name;
+     } TaxonInfo;
+
+     /* list starts at parent of this, and goes on up to root */
+     typedef structure {
+        list <TaxonInfo> decorated_scientific_lineage;
+     } DecoratedScientificLineage;
+
+     funcdef get_decorated_scientific_lineage(GetDecoratedScientificLineageParams params)
+                    returns (DecoratedScientificLineage) authentication required;
 
 };
