@@ -5,6 +5,7 @@ import doekbase.data_api.taxonomy.taxon.api
 from doekbase.data_api import cache
 import traceback
 import logging
+from datetime import datetime
 #END_HEADER
 
 
@@ -486,7 +487,11 @@ class TaxonAPI:
             print('Error getting parent for '+params['ref']+':\n'+ str(traceback.format_exc()))
             d['parent']=None
 
-        d['children']=taxon_api.get_children(ref_only=True)
+        if 'exclude_children' in params and params['exclude_children']==1:
+            pass
+        else:
+            d['children']=taxon_api.get_children(ref_only=True)
+
         d['scientific_lineage']=taxon_api.get_scientific_lineage()
         d['scientific_name']=taxon_api.get_scientific_name()
         d['taxonomic_id']=taxon_api.get_taxonomic_id()

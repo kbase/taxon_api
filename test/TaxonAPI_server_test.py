@@ -99,6 +99,11 @@ class taxon_apiTest(unittest.TestCase):
         self.assertTrue('decorated_scientific_lineage' in ret[0])
         self.assertTrue('decorated_children' not in ret[0])
 
+        ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.parent, 'exclude_children':1})
+        self.assertTrue('children' not in ret[0])
+        self.assertTrue('decorated_scientific_lineage' not in ret[0])
+        self.assertTrue('decorated_children' not in ret[0])
+
         ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.parent, 'include_decorated_children':1})
         self.assertTrue('decorated_children' in ret[0])
         self.assertTrue('decorated_scientific_lineage' not in ret[0])

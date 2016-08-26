@@ -173,6 +173,7 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
         ObjectReference ref;
         boolean include_decorated_scientific_lineage;
         boolean include_decorated_children;
+        boolean exclude_children;
      } GetAllDataParams;
 
 
