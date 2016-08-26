@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import us.kbase.auth.AuthToken;
 import us.kbase.common.service.JsonClientCaller;
 import us.kbase.common.service.JsonClientException;
@@ -50,6 +51,20 @@ public class TaxonAPIClient {
      */
     public TaxonAPIClient(URL url, String user, String password) throws UnauthorizedException, IOException {
         caller = new JsonClientCaller(url, user, password);
+    }
+
+    /** Constructs a client with a custom URL
+     * and a custom authorization service URL.
+     * @param url the URL of the service.
+     * @param user the user name.
+     * @param password the password for the user name.
+     * @param auth the URL of the authorization server.
+     * @throws UnauthorizedException if the credentials are not valid.
+     * @throws IOException if an IOException occurs when checking the user's
+     * credentials.
+     */
+    public TaxonAPIClient(URL url, String user, String password, URL auth) throws UnauthorizedException, IOException {
+        caller = new JsonClientCaller(url, user, password, auth);
     }
 
     /** Get the token this client uses to communicate with the server.
@@ -475,6 +490,64 @@ public class TaxonAPIClient {
         args.add(ref);
         TypeReference<List<String>> retType = new TypeReference<List<String>>() {};
         List<String> res = caller.jsonrpcCall("TaxonAPI.get_version", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: get_all_data</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.taxonapi.GetAllDataParams GetAllDataParams}
+     * @return   parameter "d" of type {@link us.kbase.taxonapi.TaxonData TaxonData}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public TaxonData getAllData(GetAllDataParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<TaxonData>> retType = new TypeReference<List<TaxonData>>() {};
+        List<TaxonData> res = caller.jsonrpcCall("TaxonAPI.get_all_data", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: get_decorated_scientific_lineage</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.taxonapi.GetDecoratedScientificLineageParams GetDecoratedScientificLineageParams}
+     * @return   instance of type {@link us.kbase.taxonapi.DecoratedScientificLineage DecoratedScientificLineage}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public DecoratedScientificLineage getDecoratedScientificLineage(GetDecoratedScientificLineageParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<DecoratedScientificLineage>> retType = new TypeReference<List<DecoratedScientificLineage>>() {};
+        List<DecoratedScientificLineage> res = caller.jsonrpcCall("TaxonAPI.get_decorated_scientific_lineage", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: get_decorated_children</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.taxonapi.GetDecoratedChildrenParams GetDecoratedChildrenParams}
+     * @return   instance of type {@link us.kbase.taxonapi.DecoratedChildren DecoratedChildren}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public DecoratedChildren getDecoratedChildren(GetDecoratedChildrenParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<DecoratedChildren>> retType = new TypeReference<List<DecoratedChildren>>() {};
+        List<DecoratedChildren> res = caller.jsonrpcCall("TaxonAPI.get_decorated_children", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};
+        List<Map<String, Object>> res = caller.jsonrpcCall("TaxonAPI.status", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 }
