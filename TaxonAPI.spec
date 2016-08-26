@@ -172,18 +172,30 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
      typedef structure {
         ObjectReference ref;
         boolean include_decorated_scientific_lineage;
+        boolean include_decorated_children;
      } GetAllDataParams;
+
+
+     typedef structure {
+        ObjectReference ref;
+        string scientific_name;
+     } TaxonInfo;
 
      typedef structure {
         ObjectReference parent;
+
         list<ObjectReference> children;
+        list<TaxonInfo> decorated_children;
+
         list<string> scientific_lineage;
-        list<string> decorated_scientific_lineage;
+        list<TaxonInfo> decorated_scientific_lineage;
+
         string scientific_name;
         int taxonomic_id;
         string kingdom;
         string domain;
         int genetic_code;
+
         list <string> aliases;
 
         ObjectInfo obj_info;
@@ -196,17 +208,23 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
         ObjectReference ref;
      } GetDecoratedScientificLineageParams;
 
-     typedef structure {
-        ObjectReference ref;
-        string scientific_name;
-     } TaxonInfo;
-
-     /* list starts at parent of this, and goes on up to root */
+     /* list starts at the root, and goes on down to this */
      typedef structure {
         list <TaxonInfo> decorated_scientific_lineage;
      } DecoratedScientificLineage;
 
      funcdef get_decorated_scientific_lineage(GetDecoratedScientificLineageParams params)
                     returns (DecoratedScientificLineage) authentication required;
+
+    typedef structure {
+        ObjectReference ref;
+     } GetDecoratedChildrenParams;
+
+     typedef structure {
+        list <TaxonInfo> decorated_children;
+     } DecoratedChildren;
+
+     funcdef get_decorated_children(GetDecoratedChildrenParams params)
+                    returns (DecoratedChildren) authentication required;
 
 };

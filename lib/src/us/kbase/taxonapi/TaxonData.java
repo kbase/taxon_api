@@ -22,7 +22,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "parent",
     "children",
+    "decorated_children",
     "scientific_lineage",
+    "decorated_scientific_lineage",
     "scientific_name",
     "taxonomic_id",
     "kingdom",
@@ -37,8 +39,12 @@ public class TaxonData {
     private java.lang.String parent;
     @JsonProperty("children")
     private List<String> children;
+    @JsonProperty("decorated_children")
+    private List<us.kbase.taxonapi.TaxonInfo> decoratedChildren;
     @JsonProperty("scientific_lineage")
     private List<String> scientificLineage;
+    @JsonProperty("decorated_scientific_lineage")
+    private List<us.kbase.taxonapi.TaxonInfo> decoratedScientificLineage;
     @JsonProperty("scientific_name")
     private java.lang.String scientificName;
     @JsonProperty("taxonomic_id")
@@ -92,6 +98,21 @@ public class TaxonData {
         return this;
     }
 
+    @JsonProperty("decorated_children")
+    public List<us.kbase.taxonapi.TaxonInfo> getDecoratedChildren() {
+        return decoratedChildren;
+    }
+
+    @JsonProperty("decorated_children")
+    public void setDecoratedChildren(List<us.kbase.taxonapi.TaxonInfo> decoratedChildren) {
+        this.decoratedChildren = decoratedChildren;
+    }
+
+    public TaxonData withDecoratedChildren(List<us.kbase.taxonapi.TaxonInfo> decoratedChildren) {
+        this.decoratedChildren = decoratedChildren;
+        return this;
+    }
+
     @JsonProperty("scientific_lineage")
     public List<String> getScientificLineage() {
         return scientificLineage;
@@ -104,6 +125,21 @@ public class TaxonData {
 
     public TaxonData withScientificLineage(List<String> scientificLineage) {
         this.scientificLineage = scientificLineage;
+        return this;
+    }
+
+    @JsonProperty("decorated_scientific_lineage")
+    public List<us.kbase.taxonapi.TaxonInfo> getDecoratedScientificLineage() {
+        return decoratedScientificLineage;
+    }
+
+    @JsonProperty("decorated_scientific_lineage")
+    public void setDecoratedScientificLineage(List<us.kbase.taxonapi.TaxonInfo> decoratedScientificLineage) {
+        this.decoratedScientificLineage = decoratedScientificLineage;
+    }
+
+    public TaxonData withDecoratedScientificLineage(List<us.kbase.taxonapi.TaxonInfo> decoratedScientificLineage) {
+        this.decoratedScientificLineage = decoratedScientificLineage;
         return this;
     }
 
@@ -238,7 +274,7 @@ public class TaxonData {
 
     @Override
     public java.lang.String toString() {
-        return ((((((((((((((((((((((("TaxonData"+" [parent=")+ parent)+", children=")+ children)+", scientificLineage=")+ scientificLineage)+", scientificName=")+ scientificName)+", taxonomicId=")+ taxonomicId)+", kingdom=")+ kingdom)+", domain=")+ domain)+", geneticCode=")+ geneticCode)+", aliases=")+ aliases)+", objInfo=")+ objInfo)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((((((((((((((((((("TaxonData"+" [parent=")+ parent)+", children=")+ children)+", decoratedChildren=")+ decoratedChildren)+", scientificLineage=")+ scientificLineage)+", decoratedScientificLineage=")+ decoratedScientificLineage)+", scientificName=")+ scientificName)+", taxonomicId=")+ taxonomicId)+", kingdom=")+ kingdom)+", domain=")+ domain)+", geneticCode=")+ geneticCode)+", aliases=")+ aliases)+", objInfo=")+ objInfo)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

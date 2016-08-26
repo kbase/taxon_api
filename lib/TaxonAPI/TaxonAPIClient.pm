@@ -1596,11 +1596,16 @@ $params is a TaxonAPI.GetAllDataParams
 $d is a TaxonAPI.TaxonData
 GetAllDataParams is a reference to a hash where the following keys are defined:
 	ref has a value which is a TaxonAPI.ObjectReference
+	include_decorated_scientific_lineage has a value which is a TaxonAPI.boolean
+	include_decorated_children has a value which is a TaxonAPI.boolean
 ObjectReference is a string
+boolean is an int
 TaxonData is a reference to a hash where the following keys are defined:
 	parent has a value which is a TaxonAPI.ObjectReference
 	children has a value which is a reference to a list where each element is a TaxonAPI.ObjectReference
+	decorated_children has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 	scientific_lineage has a value which is a reference to a list where each element is a string
+	decorated_scientific_lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 	scientific_name has a value which is a string
 	taxonomic_id has a value which is an int
 	kingdom has a value which is a string
@@ -1608,6 +1613,9 @@ TaxonData is a reference to a hash where the following keys are defined:
 	genetic_code has a value which is an int
 	aliases has a value which is a reference to a list where each element is a string
 	obj_info has a value which is a TaxonAPI.ObjectInfo
+TaxonInfo is a reference to a hash where the following keys are defined:
+	ref has a value which is a TaxonAPI.ObjectReference
+	scientific_name has a value which is a string
 ObjectInfo is a reference to a hash where the following keys are defined:
 	object_id has a value which is an int
 	object_name has a value which is a string
@@ -1633,11 +1641,16 @@ $params is a TaxonAPI.GetAllDataParams
 $d is a TaxonAPI.TaxonData
 GetAllDataParams is a reference to a hash where the following keys are defined:
 	ref has a value which is a TaxonAPI.ObjectReference
+	include_decorated_scientific_lineage has a value which is a TaxonAPI.boolean
+	include_decorated_children has a value which is a TaxonAPI.boolean
 ObjectReference is a string
+boolean is an int
 TaxonData is a reference to a hash where the following keys are defined:
 	parent has a value which is a TaxonAPI.ObjectReference
 	children has a value which is a reference to a list where each element is a TaxonAPI.ObjectReference
+	decorated_children has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 	scientific_lineage has a value which is a reference to a list where each element is a string
+	decorated_scientific_lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 	scientific_name has a value which is a string
 	taxonomic_id has a value which is an int
 	kingdom has a value which is a string
@@ -1645,6 +1658,9 @@ TaxonData is a reference to a hash where the following keys are defined:
 	genetic_code has a value which is an int
 	aliases has a value which is a reference to a list where each element is a string
 	obj_info has a value which is a TaxonAPI.ObjectInfo
+TaxonInfo is a reference to a hash where the following keys are defined:
+	ref has a value which is a TaxonAPI.ObjectReference
+	scientific_name has a value which is a string
 ObjectInfo is a reference to a hash where the following keys are defined:
 	object_id has a value which is an int
 	object_name has a value which is a string
@@ -1721,7 +1737,7 @@ ObjectInfo is a reference to a hash where the following keys are defined:
 
 =head2 get_decorated_scientific_lineage
 
-  $lineage = $obj->get_decorated_scientific_lineage($params)
+  $return = $obj->get_decorated_scientific_lineage($params)
 
 =over 4
 
@@ -1731,12 +1747,12 @@ ObjectInfo is a reference to a hash where the following keys are defined:
 
 <pre>
 $params is a TaxonAPI.GetDecoratedScientificLineageParams
-$lineage is a TaxonAPI.DecoratedLineage
+$return is a TaxonAPI.DecoratedScientificLineage
 GetDecoratedScientificLineageParams is a reference to a hash where the following keys are defined:
 	ref has a value which is a TaxonAPI.ObjectReference
 ObjectReference is a string
-DecoratedLineage is a reference to a hash where the following keys are defined:
-	lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
+DecoratedScientificLineage is a reference to a hash where the following keys are defined:
+	decorated_scientific_lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 TaxonInfo is a reference to a hash where the following keys are defined:
 	ref has a value which is a TaxonAPI.ObjectReference
 	scientific_name has a value which is a string
@@ -1748,12 +1764,12 @@ TaxonInfo is a reference to a hash where the following keys are defined:
 =begin text
 
 $params is a TaxonAPI.GetDecoratedScientificLineageParams
-$lineage is a TaxonAPI.DecoratedLineage
+$return is a TaxonAPI.DecoratedScientificLineage
 GetDecoratedScientificLineageParams is a reference to a hash where the following keys are defined:
 	ref has a value which is a TaxonAPI.ObjectReference
 ObjectReference is a string
-DecoratedLineage is a reference to a hash where the following keys are defined:
-	lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
+DecoratedScientificLineage is a reference to a hash where the following keys are defined:
+	decorated_scientific_lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 TaxonInfo is a reference to a hash where the following keys are defined:
 	ref has a value which is a TaxonAPI.ObjectReference
 	scientific_name has a value which is a string
@@ -1815,6 +1831,104 @@ TaxonInfo is a reference to a hash where the following keys are defined:
     }
 }
  
+
+
+=head2 get_decorated_children
+
+  $return = $obj->get_decorated_children($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a TaxonAPI.GetDecoratedChildrenParams
+$return is a TaxonAPI.DecoratedChildren
+GetDecoratedChildrenParams is a reference to a hash where the following keys are defined:
+	ref has a value which is a TaxonAPI.ObjectReference
+ObjectReference is a string
+DecoratedChildren is a reference to a hash where the following keys are defined:
+	decorated_children has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
+TaxonInfo is a reference to a hash where the following keys are defined:
+	ref has a value which is a TaxonAPI.ObjectReference
+	scientific_name has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a TaxonAPI.GetDecoratedChildrenParams
+$return is a TaxonAPI.DecoratedChildren
+GetDecoratedChildrenParams is a reference to a hash where the following keys are defined:
+	ref has a value which is a TaxonAPI.ObjectReference
+ObjectReference is a string
+DecoratedChildren is a reference to a hash where the following keys are defined:
+	decorated_children has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
+TaxonInfo is a reference to a hash where the following keys are defined:
+	ref has a value which is a TaxonAPI.ObjectReference
+	scientific_name has a value which is a string
+
+
+=end text
+
+=item Description
+
+
+
+=back
+
+=cut
+
+ sub get_decorated_children
+{
+    my($self, @args) = @_;
+
+# Authentication: required
+
+    if ((my $n = @args) != 1)
+    {
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
+							       "Invalid argument count for function get_decorated_children (received $n, expecting 1)");
+    }
+    {
+	my($params) = @args;
+
+	my @_bad_arguments;
+        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
+        if (@_bad_arguments) {
+	    my $msg = "Invalid arguments passed to get_decorated_children:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+								   method_name => 'get_decorated_children');
+	}
+    }
+
+    my $url = $self->{url};
+    my $result = $self->{client}->call($url, $self->{headers}, {
+	    method => "TaxonAPI.get_decorated_children",
+	    params => \@args,
+    });
+    if ($result) {
+	if ($result->is_error) {
+	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
+					       code => $result->content->{error}->{code},
+					       method_name => 'get_decorated_children',
+					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
+					      );
+	} else {
+	    return wantarray ? @{$result->result} : $result->result->[0];
+	}
+    } else {
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method get_decorated_children",
+					    status_line => $self->{client}->status_line,
+					    method_name => 'get_decorated_children',
+				       );
+    }
+}
+ 
   
 sub status
 {
@@ -1858,16 +1972,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'get_decorated_scientific_lineage',
+                method_name => 'get_decorated_children',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method get_decorated_scientific_lineage",
+            error => "Error invoking method get_decorated_children",
             status_line => $self->{client}->status_line,
-            method_name => 'get_decorated_scientific_lineage',
+            method_name => 'get_decorated_children',
         );
     }
 }
@@ -1901,6 +2015,37 @@ sub _validate_version {
 }
 
 =head1 TYPES
+
+
+
+=head2 boolean
+
+=over 4
+
+
+
+=item Description
+
+A boolean. 0 = false, other = true.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+an int
+</pre>
+
+=end html
+
+=begin text
+
+an int
+
+=end text
+
+=back
 
 
 
@@ -2172,6 +2317,8 @@ a reference to a list where each element is a TaxonAPI.ObjectProvenanceAction
 <pre>
 a reference to a hash where the following keys are defined:
 ref has a value which is a TaxonAPI.ObjectReference
+include_decorated_scientific_lineage has a value which is a TaxonAPI.boolean
+include_decorated_children has a value which is a TaxonAPI.boolean
 
 </pre>
 
@@ -2181,6 +2328,40 @@ ref has a value which is a TaxonAPI.ObjectReference
 
 a reference to a hash where the following keys are defined:
 ref has a value which is a TaxonAPI.ObjectReference
+include_decorated_scientific_lineage has a value which is a TaxonAPI.boolean
+include_decorated_children has a value which is a TaxonAPI.boolean
+
+
+=end text
+
+=back
+
+
+
+=head2 TaxonInfo
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+ref has a value which is a TaxonAPI.ObjectReference
+scientific_name has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+ref has a value which is a TaxonAPI.ObjectReference
+scientific_name has a value which is a string
 
 
 =end text
@@ -2203,7 +2384,9 @@ ref has a value which is a TaxonAPI.ObjectReference
 a reference to a hash where the following keys are defined:
 parent has a value which is a TaxonAPI.ObjectReference
 children has a value which is a reference to a list where each element is a TaxonAPI.ObjectReference
+decorated_children has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 scientific_lineage has a value which is a reference to a list where each element is a string
+decorated_scientific_lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 scientific_name has a value which is a string
 taxonomic_id has a value which is an int
 kingdom has a value which is a string
@@ -2221,7 +2404,9 @@ obj_info has a value which is a TaxonAPI.ObjectInfo
 a reference to a hash where the following keys are defined:
 parent has a value which is a TaxonAPI.ObjectReference
 children has a value which is a reference to a list where each element is a TaxonAPI.ObjectReference
+decorated_children has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 scientific_lineage has a value which is a reference to a list where each element is a string
+decorated_scientific_lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 scientific_name has a value which is a string
 taxonomic_id has a value which is an int
 kingdom has a value which is a string
@@ -2267,10 +2452,15 @@ ref has a value which is a TaxonAPI.ObjectReference
 
 
 
-=head2 TaxonInfo
+=head2 DecoratedScientificLineage
 
 =over 4
 
+
+
+=item Description
+
+list starts at the root, and goes on down to this
 
 
 =item Definition
@@ -2279,8 +2469,7 @@ ref has a value which is a TaxonAPI.ObjectReference
 
 <pre>
 a reference to a hash where the following keys are defined:
-ref has a value which is a TaxonAPI.ObjectReference
-scientific_name has a value which is a string
+decorated_scientific_lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 
 </pre>
 
@@ -2289,8 +2478,7 @@ scientific_name has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-ref has a value which is a TaxonAPI.ObjectReference
-scientific_name has a value which is a string
+decorated_scientific_lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 
 
 =end text
@@ -2299,15 +2487,10 @@ scientific_name has a value which is a string
 
 
 
-=head2 DecoratedLineage
+=head2 GetDecoratedChildrenParams
 
 =over 4
 
-
-
-=item Description
-
-list starts at parent of this, and goes on up to root
 
 
 =item Definition
@@ -2316,7 +2499,7 @@ list starts at parent of this, and goes on up to root
 
 <pre>
 a reference to a hash where the following keys are defined:
-lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
+ref has a value which is a TaxonAPI.ObjectReference
 
 </pre>
 
@@ -2325,7 +2508,37 @@ lineage has a value which is a reference to a list where each element is a Taxon
 =begin text
 
 a reference to a hash where the following keys are defined:
-lineage has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
+ref has a value which is a TaxonAPI.ObjectReference
+
+
+=end text
+
+=back
+
+
+
+=head2 DecoratedChildren
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+decorated_children has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+decorated_children has a value which is a reference to a list where each element is a TaxonAPI.TaxonInfo
 
 
 =end text

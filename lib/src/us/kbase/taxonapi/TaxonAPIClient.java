@@ -515,15 +515,32 @@ public class TaxonAPIClient {
      * <pre>
      * </pre>
      * @param   params   instance of type {@link us.kbase.taxonapi.GetDecoratedScientificLineageParams GetDecoratedScientificLineageParams}
-     * @return   parameter "lineage" of type {@link us.kbase.taxonapi.DecoratedLineage DecoratedLineage}
+     * @return   instance of type {@link us.kbase.taxonapi.DecoratedScientificLineage DecoratedScientificLineage}
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public DecoratedLineage getDecoratedScientificLineage(GetDecoratedScientificLineageParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public DecoratedScientificLineage getDecoratedScientificLineage(GetDecoratedScientificLineageParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
-        TypeReference<List<DecoratedLineage>> retType = new TypeReference<List<DecoratedLineage>>() {};
-        List<DecoratedLineage> res = caller.jsonrpcCall("TaxonAPI.get_decorated_scientific_lineage", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        TypeReference<List<DecoratedScientificLineage>> retType = new TypeReference<List<DecoratedScientificLineage>>() {};
+        List<DecoratedScientificLineage> res = caller.jsonrpcCall("TaxonAPI.get_decorated_scientific_lineage", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        return res.get(0);
+    }
+
+    /**
+     * <p>Original spec-file function name: get_decorated_children</p>
+     * <pre>
+     * </pre>
+     * @param   params   instance of type {@link us.kbase.taxonapi.GetDecoratedChildrenParams GetDecoratedChildrenParams}
+     * @return   instance of type {@link us.kbase.taxonapi.DecoratedChildren DecoratedChildren}
+     * @throws IOException if an IO exception occurs
+     * @throws JsonClientException if a JSON RPC exception occurs
+     */
+    public DecoratedChildren getDecoratedChildren(GetDecoratedChildrenParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+        List<Object> args = new ArrayList<Object>();
+        args.add(params);
+        TypeReference<List<DecoratedChildren>> retType = new TypeReference<List<DecoratedChildren>>() {};
+        List<DecoratedChildren> res = caller.jsonrpcCall("TaxonAPI.get_decorated_children", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 

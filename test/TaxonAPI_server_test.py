@@ -86,6 +86,7 @@ class taxon_apiTest(unittest.TestCase):
         ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.taxon})
         self.assertEqual(ret[0]['parent'],self.parent)
         self.assertTrue('decorated_scientific_lineage' not in ret[0])
+        self.assertTrue('decorated_children' not in ret[0])
         self.assertEqual(ret[0]['children'],[])
         self.assertEqual(ret[0]['domain'],'Eukaryota')
         self.assertEqual(ret[0]['genetic_code'],1)
@@ -96,6 +97,11 @@ class taxon_apiTest(unittest.TestCase):
         ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.taxon, 'include_decorated_scientific_lineage':1})
         self.assertEqual(ret[0]['parent'],self.parent)
         self.assertTrue('decorated_scientific_lineage' in ret[0])
+        self.assertTrue('decorated_children' not in ret[0])
+
+        ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.parent, 'include_decorated_children':1})
+        self.assertTrue('decorated_children' in ret[0])
+        self.assertTrue('decorated_scientific_lineage' not in ret[0])
 
         ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.root_taxon})
         self.assertEqual(ret[0]['parent'],None)
@@ -109,9 +115,15 @@ class taxon_apiTest(unittest.TestCase):
         ret = self.getImpl().get_children(self.getContext(), self.taxon)
         self.assertEqual(ret[0],[])
 
+    def test_get_decorated_children(self):
+        ret = self.getImpl().get_decorated_children(self.getContext(), {'ref': self.root_taxon})
+        # tricky to test without loading specific test data- the number of children can change (usually
+        # increase, but objects could be deleted too)
+        self.assertTrue(len(ret[0]['decorated_children'])>=5)
+        
     def test_get_genome_annotations(self):
         ret = self.getImpl().get_genome_annotations(self.getContext(), self.taxon)
-        print ret
+        self.assertTrue(len(ret[0])>0)
         # this fails as the test taxon is referenced- so we can't do this.
     #    self.assertEqual(ret[0], ['7364/20/13', '7364/10/1', '6838/147/1', '5810/70/1', '6831/12/1', 
 	#	'7695/21/1', '5729/70/1', '7990/93/1', '8020/81/1', '8020/39/1', '7824/35/1', 

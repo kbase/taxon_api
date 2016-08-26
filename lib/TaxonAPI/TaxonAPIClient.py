@@ -245,17 +245,26 @@ class TaxonAPI(object):
     def get_all_data(self, params, context=None):
         """
         :param params: instance of type "GetAllDataParams" -> structure:
-           parameter "ref" of type "ObjectReference"
+           parameter "ref" of type "ObjectReference", parameter
+           "include_decorated_scientific_lineage" of type "boolean" (A
+           boolean. 0 = false, other = true.), parameter
+           "include_decorated_children" of type "boolean" (A boolean. 0 =
+           false, other = true.)
         :returns: instance of type "TaxonData" -> structure: parameter
            "parent" of type "ObjectReference", parameter "children" of list
-           of type "ObjectReference", parameter "scientific_lineage" of list
-           of String, parameter "scientific_name" of String, parameter
-           "taxonomic_id" of Long, parameter "kingdom" of String, parameter
-           "domain" of String, parameter "genetic_code" of Long, parameter
-           "aliases" of list of String, parameter "obj_info" of type
-           "ObjectInfo" (* @skip documentation) -> structure: parameter
-           "object_id" of Long, parameter "object_name" of String, parameter
-           "object_reference" of String, parameter
+           of type "ObjectReference", parameter "decorated_children" of list
+           of type "TaxonInfo" -> structure: parameter "ref" of type
+           "ObjectReference", parameter "scientific_name" of String,
+           parameter "scientific_lineage" of list of String, parameter
+           "decorated_scientific_lineage" of list of type "TaxonInfo" ->
+           structure: parameter "ref" of type "ObjectReference", parameter
+           "scientific_name" of String, parameter "scientific_name" of
+           String, parameter "taxonomic_id" of Long, parameter "kingdom" of
+           String, parameter "domain" of String, parameter "genetic_code" of
+           Long, parameter "aliases" of list of String, parameter "obj_info"
+           of type "ObjectInfo" (* @skip documentation) -> structure:
+           parameter "object_id" of Long, parameter "object_name" of String,
+           parameter "object_reference" of String, parameter
            "object_reference_versioned" of String, parameter "type_string" of
            String, parameter "save_date" of String, parameter "version" of
            Long, parameter "saved_by" of String, parameter "workspace_id" of
@@ -271,13 +280,27 @@ class TaxonAPI(object):
         """
         :param params: instance of type "GetDecoratedScientificLineageParams"
            -> structure: parameter "ref" of type "ObjectReference"
-        :returns: instance of type "DecoratedLineage" (list starts at parent
-           of this, and goes on up to root) -> structure: parameter "lineage"
-           of list of type "TaxonInfo" -> structure: parameter "ref" of type
-           "ObjectReference", parameter "scientific_name" of String
+        :returns: instance of type "DecoratedScientificLineage" (list starts
+           at the root, and goes on down to this) -> structure: parameter
+           "decorated_scientific_lineage" of list of type "TaxonInfo" ->
+           structure: parameter "ref" of type "ObjectReference", parameter
+           "scientific_name" of String
         """
         return self._client.call_method(
             'TaxonAPI.get_decorated_scientific_lineage',
+            [params], self._service_ver, context)
+
+    def get_decorated_children(self, params, context=None):
+        """
+        :param params: instance of type "GetDecoratedChildrenParams" ->
+           structure: parameter "ref" of type "ObjectReference"
+        :returns: instance of type "DecoratedChildren" -> structure:
+           parameter "decorated_children" of list of type "TaxonInfo" ->
+           structure: parameter "ref" of type "ObjectReference", parameter
+           "scientific_name" of String
+        """
+        return self._client.call_method(
+            'TaxonAPI.get_decorated_children',
             [params], self._service_ver, context)
 
     def status(self, context=None):

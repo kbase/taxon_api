@@ -23,9 +23,9 @@ class TaxonAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     #########################################
-    VERSION = "0.0.1"
+    VERSION = "0.0.2"
     GIT_URL = "git@github.com:kbase/taxon_api"
-    GIT_COMMIT_HASH = "e3a1bba206c3efbc92f171366610dbb5cd43d4a2"
+    GIT_COMMIT_HASH = "30e969aff0bd259f710e14b4468a2a73367f07cf"
     
     #BEGIN_CLASS_HEADER
     #END_CLASS_HEADER
@@ -446,17 +446,26 @@ class TaxonAPI:
     def get_all_data(self, ctx, params):
         """
         :param params: instance of type "GetAllDataParams" -> structure:
-           parameter "ref" of type "ObjectReference"
+           parameter "ref" of type "ObjectReference", parameter
+           "include_decorated_scientific_lineage" of type "boolean" (A
+           boolean. 0 = false, other = true.), parameter
+           "include_decorated_children" of type "boolean" (A boolean. 0 =
+           false, other = true.)
         :returns: instance of type "TaxonData" -> structure: parameter
            "parent" of type "ObjectReference", parameter "children" of list
-           of type "ObjectReference", parameter "scientific_lineage" of list
-           of String, parameter "scientific_name" of String, parameter
-           "taxonomic_id" of Long, parameter "kingdom" of String, parameter
-           "domain" of String, parameter "genetic_code" of Long, parameter
-           "aliases" of list of String, parameter "obj_info" of type
-           "ObjectInfo" (* @skip documentation) -> structure: parameter
-           "object_id" of Long, parameter "object_name" of String, parameter
-           "object_reference" of String, parameter
+           of type "ObjectReference", parameter "decorated_children" of list
+           of type "TaxonInfo" -> structure: parameter "ref" of type
+           "ObjectReference", parameter "scientific_name" of String,
+           parameter "scientific_lineage" of list of String, parameter
+           "decorated_scientific_lineage" of list of type "TaxonInfo" ->
+           structure: parameter "ref" of type "ObjectReference", parameter
+           "scientific_name" of String, parameter "scientific_name" of
+           String, parameter "taxonomic_id" of Long, parameter "kingdom" of
+           String, parameter "domain" of String, parameter "genetic_code" of
+           Long, parameter "aliases" of list of String, parameter "obj_info"
+           of type "ObjectInfo" (* @skip documentation) -> structure:
+           parameter "object_id" of Long, parameter "object_name" of String,
+           parameter "object_reference" of String, parameter
            "object_reference_versioned" of String, parameter "type_string" of
            String, parameter "save_date" of String, parameter "version" of
            Long, parameter "saved_by" of String, parameter "workspace_id" of
@@ -497,6 +506,10 @@ class TaxonAPI:
             l = self.get_decorated_scientific_lineage(ctx, {'ref':params['ref']})[0]
             d['decorated_scientific_lineage'] = l['decorated_scientific_lineage']
 
+        if 'include_decorated_children' in params and params['include_decorated_children']==1:
+            l = self.get_decorated_children(ctx, {'ref':params['ref']})[0]
+            d['decorated_children'] = l['decorated_children']
+
         #END get_all_data
 
         # At some point might do deeper type checking...
@@ -510,13 +523,14 @@ class TaxonAPI:
         """
         :param params: instance of type "GetDecoratedScientificLineageParams"
            -> structure: parameter "ref" of type "ObjectReference"
-        :returns: instance of type "DecoratedLineage" (list starts at parent
-           of this, and goes on up to root) -> structure: parameter "lineage"
-           of list of type "TaxonInfo" -> structure: parameter "ref" of type
-           "ObjectReference", parameter "scientific_name" of String
+        :returns: instance of type "DecoratedScientificLineage" (list starts
+           at the root, and goes on down to this) -> structure: parameter
+           "decorated_scientific_lineage" of list of type "TaxonInfo" ->
+           structure: parameter "ref" of type "ObjectReference", parameter
+           "scientific_name" of String
         """
         # ctx is the context object
-        # return variables are: lineage
+        # return variables are: returnVal
         #BEGIN get_decorated_scientific_lineage
 
         lineageList = [];
@@ -554,11 +568,46 @@ class TaxonAPI:
         #END get_decorated_scientific_lineage
 
         # At some point might do deeper type checking...
-        if not isinstance(lineage, dict):
+        if not isinstance(returnVal, dict):
             raise ValueError('Method get_decorated_scientific_lineage return value ' +
-                             'lineage is not type dict as required.')
+                             'returnVal is not type dict as required.')
         # return the results
-        return [lineage]
+        return [returnVal]
+
+    def get_decorated_children(self, ctx, params):
+        """
+        :param params: instance of type "GetDecoratedChildrenParams" ->
+           structure: parameter "ref" of type "ObjectReference"
+        :returns: instance of type "DecoratedChildren" -> structure:
+           parameter "decorated_children" of list of type "TaxonInfo" ->
+           structure: parameter "ref" of type "ObjectReference", parameter
+           "scientific_name" of String
+        """
+        # ctx is the context object
+        # return variables are: returnVal
+        #BEGIN get_decorated_children
+
+        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], params['ref'])
+
+        children_refs=taxon_api.get_children(ref_only=True)
+
+        decorated_children = []
+        for child_ref in children_refs:
+            child = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], child_ref)
+            decorated_children.append({
+                    'ref':child_ref,
+                    'scientific_name':child.get_scientific_name()
+                })
+
+        returnVal = { 'decorated_children': decorated_children }
+        #END get_decorated_children
+
+        # At some point might do deeper type checking...
+        if not isinstance(returnVal, dict):
+            raise ValueError('Method get_decorated_children return value ' +
+                             'returnVal is not type dict as required.')
+        # return the results
+        return [returnVal]
 
     def status(self, ctx):
         #BEGIN_STATUS

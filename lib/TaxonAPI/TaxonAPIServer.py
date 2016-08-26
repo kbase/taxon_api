@@ -401,6 +401,10 @@ class Application(object):
                              name='TaxonAPI.get_decorated_scientific_lineage',
                              types=[dict])
         self.method_authentication['TaxonAPI.get_decorated_scientific_lineage'] = 'required'
+        self.rpc_service.add(impl_TaxonAPI.get_decorated_children,
+                             name='TaxonAPI.get_decorated_children',
+                             types=[dict])
+        self.method_authentication['TaxonAPI.get_decorated_children'] = 'required'
         self.rpc_service.add(impl_TaxonAPI.status,
                              name='TaxonAPI.status',
                              types=[dict])
