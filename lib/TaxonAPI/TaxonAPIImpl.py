@@ -672,7 +672,7 @@ class TaxonAPI:
         for child_ref in children_refs:
             decorated_children.append({
                 'ref': child_ref,
-                'scientific_name': self.get_data(ref)['scientific_name']
+                'scientific_name': self.get_data(child_ref)['scientific_name']
             })
 
         returnVal = {'decorated_children': decorated_children}
