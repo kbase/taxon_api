@@ -1,11 +1,8 @@
 import unittest
-import os
-import json
 import time
 
 from os import environ
 from ConfigParser import ConfigParser
-from pprint import pprint
 
 from biokbase.workspace.client import Workspace as workspaceService
 from TaxonAPI.TaxonAPIImpl import TaxonAPI
@@ -36,9 +33,9 @@ class taxon_apiTest(unittest.TestCase):
         cls.wsURL = cls.cfg['workspace-url']
         cls.wsClient = workspaceService(cls.wsURL, token=token)
         cls.serviceImpl = TaxonAPI(cls.cfg)
-        cls.taxon='1779/523209/1'
-        cls.parent=u'1779/178590/1'
-        cls.root_taxon='1779/1/1'
+        cls.taxon = '1779/523209/1'
+        cls.parent = u'1779/178590/1'
+        cls.root_taxon = '1779/1/1'
 
     @classmethod
     def tearDownClass(cls):
@@ -54,7 +51,7 @@ class taxon_apiTest(unittest.TestCase):
             return self.__class__.wsName
         suffix = int(time.time() * 1000)
         wsName = "TaxonAPI_" + str(suffix)
-        ret = self.getWsClient().create_workspace({'workspace': wsName})
+        self.getWsClient().create_workspace({'workspace': wsName})
         self.__class__.wsName = wsName
         return wsName
 
@@ -64,92 +61,99 @@ class taxon_apiTest(unittest.TestCase):
     def getContext(self):
         return self.__class__.ctx
 
-    def test_your_method(self):
-        # Prepare test objects in workspace if needed using 
-        # self.getWsClient().save_objects({'workspace': self.getWsName(), 'objects': []})
-        #
-        # Run your method by
-        # ret = self.getImpl().your_method(self.getContext(), parameters...)
-        #
-        # Check returned data with
-        # self.assertEqual(ret[...], ...) or other unittest methods
-        pass
-
     def test_get_parent(self):
         ret = self.getImpl().get_parent(self.getContext(), self.taxon)
-        self.assertEqual(ret[0],self.parent)
+        self.assertEqual(ret[0], self.parent)
 
         ret = self.getImpl().get_parent(self.getContext(), self.root_taxon)
-        self.assertEqual(ret[0],'')
+        self.assertEqual(ret[0], '')
 
     def test_get_all_data(self):
-        ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.taxon})
-        self.assertEqual(ret[0]['parent'],self.parent)
+        ret = self.getImpl().get_all_data(self.getContext(),
+                                          {'ref': self.taxon})
+        self.assertEqual(ret[0]['parent'], self.parent)
         self.assertTrue('decorated_scientific_lineage' not in ret[0])
         self.assertTrue('decorated_children' not in ret[0])
-        self.assertEqual(ret[0]['children'],[])
-        self.assertEqual(ret[0]['domain'],'Eukaryota')
-        self.assertEqual(ret[0]['genetic_code'],1)
-        self.assertEqual(ret[0]['info']['object_checksum'],'5f1b24082f447daccca0c8d2f1073fe4')
-        self.assertEqual(ret[0]['scientific_name'],'Cyanidioschyzon merolae strain 10D')
-        self.assertEqual(ret[0]['taxonomic_id'],280699)
+        self.assertEqual(ret[0]['children'], [])
+        self.assertEqual(ret[0]['domain'], 'Eukaryota')
+        self.assertEqual(ret[0]['genetic_code'], 1)
+        self.assertEqual(ret[0]['info']['object_checksum'],
+                         '5f1b24082f447daccca0c8d2f1073fe4')
+        self.assertEqual(ret[0]['scientific_name'],
+                         'Cyanidioschyzon merolae strain 10D')
+        self.assertEqual(ret[0]['taxonomic_id'], 280699)
+        item = {
+            'ref': self.taxon,
+            'include_decorated_scientific_lineage': 1
+        }
 
-        ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.taxon, 'include_decorated_scientific_lineage':1})
-        self.assertEqual(ret[0]['parent'],self.parent)
+        ret = self.getImpl().get_all_data(self.getContext(), item)
+        self.assertEqual(ret[0]['parent'], self.parent)
         self.assertTrue('decorated_scientific_lineage' in ret[0])
         self.assertTrue('decorated_children' not in ret[0])
 
-        ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.parent, 'exclude_children':1})
+        ret = self.getImpl().get_all_data(self.getContext(),
+                                          {'ref': self.parent,
+                                          'exclude_children': 1})
         self.assertTrue('children' not in ret[0])
         self.assertTrue('decorated_scientific_lineage' not in ret[0])
         self.assertTrue('decorated_children' not in ret[0])
-
-        ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.parent, 'include_decorated_children':1})
+        p = {'ref': self.parent, 'include_decorated_children': 1}
+        ret = self.getImpl().get_all_data(self.getContext(), p)
         self.assertTrue('decorated_children' in ret[0])
         self.assertTrue('decorated_scientific_lineage' not in ret[0])
 
         ret = self.getImpl().get_all_data(self.getContext(), {'ref': self.root_taxon})
-        self.assertEqual(ret[0]['parent'],None)
+        self.assertEqual(ret[0]['parent'], None)
 
     def test_get_decorated_lineage(self):
-        ret = self.getImpl().get_decorated_scientific_lineage(self.getContext(), {'ref': self.taxon})
-        self.assertEqual(len(ret[0]['decorated_scientific_lineage']),8)
-        self.assertEqual(ret[0]['decorated_scientific_lineage'][0]['scientific_name'], 'cellular organisms')
+        p = {'ref': self.taxon}
+        ret = self.getImpl().get_decorated_scientific_lineage(self.getContext(), p)
+        lineage = ret[0]['decorated_scientific_lineage']
+        self.assertEqual(len(lineage), 8)
+
+        self.assertEqual(lineage[0]['scientific_name'], 'cellular organisms')
 
     def test_get_children(self):
         ret = self.getImpl().get_children(self.getContext(), self.taxon)
-        self.assertEqual(ret[0],[])
+        self.assertEqual(ret[0], [])
 
     def test_get_decorated_children(self):
         ret = self.getImpl().get_decorated_children(self.getContext(), {'ref': self.root_taxon})
-        # tricky to test without loading specific test data- the number of children can change (usually
+        # tricky to test without loading specific test data- the number
+        # of children can change (usually
         # increase, but objects could be deleted too)
-        self.assertTrue(len(ret[0]['decorated_children'])>=5)
-        
+        self.assertTrue(len(ret[0]['decorated_children']) >= 5)
+
     def test_get_genome_annotations(self):
         ret = self.getImpl().get_genome_annotations(self.getContext(), self.taxon)
-        self.assertTrue(len(ret[0])>0)
+        self.assertTrue(len(ret[0]) > 0)
         # this fails as the test taxon is referenced- so we can't do this.
-    #    self.assertEqual(ret[0], ['7364/20/13', '7364/10/1', '6838/147/1', '5810/70/1', '6831/12/1', 
-	#	'7695/21/1', '5729/70/1', '7990/93/1', '8020/81/1', '8020/39/1', '7824/35/1', 
-	#	'1837/570/3', '1374/676/1', '5441/70/1', '4758/9/1', '4435/71/1', '4237/79/1'])
+        #    self.assertEqual(ret[0], ['7364/20/13', '7364/10/1', '6838/147/1',
+        #    '5810/70/1', '6831/12/1','7695/21/1', '5729/70/1', '7990/93/1',
+        #    '8020/81/1', '8020/39/1', '7824/35/1',
+        #	'1837/570/3', '1374/676/1', '5441/70/1', '4758/9/1', '4435/71/1',
+        #    '4237/79/1'])
 
     def test_get_scientific_lineage(self):
         ret = self.getImpl().get_scientific_lineage(self.getContext(), self.taxon)
-        self.assertEqual(ret[0], [u'cellular organisms', u'Eukaryota', u'Rhodophyta', u'Bangiophyceae', u'Cyanidiales', u'Cyanidiaceae', u'Cyanidioschyzon', u'Cyanidioschyzon merolae'])
+        self.assertEqual(ret[0], [u'cellular organisms', u'Eukaryota',
+                                  u'Rhodophyta', u'Bangiophyceae',
+                                  u'Cyanidiales', u'Cyanidiaceae',
+                                  u'Cyanidioschyzon',
+                                  u'Cyanidioschyzon merolae'])
 
     def test_get_scientific_name(self):
         ret = self.getImpl().get_scientific_name(self.getContext(), self.taxon)
-        self.assertEqual(ret[0],u'Cyanidioschyzon merolae strain 10D')
+        self.assertEqual(ret[0], u'Cyanidioschyzon merolae strain 10D')
 
     def test_get_taxonomic_id(self):
         ret = self.getImpl().get_taxonomic_id(self.getContext(), self.taxon)
-        self.assertEqual(ret[0],280699)
+        self.assertEqual(ret[0], 280699)
 
-    #def test_get_kingdom(self):
-    #    ret = self.getImpl().get_kingdom(self.getContext(), self.taxon)
-    #    print ret
-    #    self.assertEqual(ret[0],u'cellular organisms')
+    def xtest_get_kingdom(self):
+        ret = self.getImpl().get_kingdom(self.getContext(), self.taxon)
+        self.assertEqual(ret[0], u'cellular organisms')
 
     def test_get_domain(self):
         ret = self.getImpl().get_domain(self.getContext(), self.taxon)
@@ -157,32 +161,62 @@ class taxon_apiTest(unittest.TestCase):
 
     def test_get_genetic_code(self):
         ret = self.getImpl().get_genetic_code(self.getContext(), self.taxon)
-        self.assertEqual(ret[0],1)
+        self.assertEqual(ret[0], 1)
 
     def test_get_aliases(self):
         ret = self.getImpl().get_aliases(self.getContext(), self.taxon)
-        print ret
-        self.assertEqual(ret[0],[])
+        self.assertEqual(ret[0], [])
 
     def test_get_info(self):
         ret = self.getImpl().get_info(self.getContext(), self.taxon)
-        print ret
-        self.assertEqual(ret[0], {'type_string': u'KBaseGenomeAnnotations.Taxon-1.0', 'workspace_id': 1779, 'object_checksum': u'5f1b24082f447daccca0c8d2f1073fe4', 'object_reference': '1779/523209', 'object_size': 455, 'saved_by': u'kbasetest', 'object_id': 523209, 'save_date': u'2015-10-08T18:44:34+0000', 'object_metadata': None, 'object_name': u'280699_taxon', 'version': 1, 'workspace_name': u'ReferenceTaxons', 'object_reference_versioned': '1779/523209/1'} )
+        exp = {
+            'type_string': u'KBaseGenomeAnnotations.Taxon-1.0',
+            'workspace_id': 1779,
+            'object_checksum': u'5f1b24082f447daccca0c8d2f1073fe4',
+            'object_reference': '1779/523209',
+            'object_size': 455,
+            'saved_by': u'kbasetest',
+            'object_id': 523209,
+            'save_date': u'2015-10-08T18:44:34+0000',
+            'object_metadata': None,
+            'object_name': u'280699_taxon',
+            'version': 1,
+            'workspace_name': u'ReferenceTaxons',
+            'object_reference_versioned': '1779/523209/1'
+        }
+        self.assertEqual(ret[0], exp)
 
     def test_get_history(self):
         ret = self.getImpl().get_history(self.getContext(), self.taxon)
-        print ret
-        self.assertEqual(ret[0], [{'object_checksum': u'5f1b24082f447daccca0c8d2f1073fe4', 'object_id': 523209, 'object_metadata': {}, 'object_name': u'280699_taxon', 'object_reference': '1779/523209', 'object_reference_versioned': '1779/523209/1', 'object_size': 455, 'save_date': u'2015-10-08T18:44:34+0000', 'saved_by': u'kbasetest', 'type_string': u'KBaseGenomeAnnotations.Taxon-1.0', 'version': 1, 'workspace_id': 1779, 'workspace_name': u'ReferenceTaxons'}])
+        # kt = ret[0][0].pop('type_string')
+        # print kt
+        expected = {'object_checksum': u'5f1b24082f447daccca0c8d2f1073fe4',
+                    'object_id': 523209,
+                    'object_metadata': None,
+                    'object_name': u'280699_taxon',
+                    'object_reference': '1779/523209',
+                    'object_reference_versioned': '1779/523209/1',
+                    'object_size': 455,
+                    'save_date': u'2015-10-08T18:44:34+0000',
+                    'saved_by': u'kbasetest',
+                    'type_string': u'KBaseGenomeAnnotations.Taxon-1.0',
+                    'version': 1,
+                    'workspace_id': 1779,
+                    'workspace_name': u'ReferenceTaxons'}
+        self.assertEqual(ret[0][0], expected)
 
     def test_get_provenance(self):
         ret = self.getImpl().get_provenance(self.getContext(), self.taxon)
-        print ret
-        self.assertEqual(ret[0], [{'description': u'taxon generated from NCBI taxonomy names and nodes files downloaded on 7/20/2015.', 'script_name': u'make_taxons.py', 'script_version': u'0.1'}])
+        exp = {
+            'description': u'taxon generated from NCBI taxonomy names and nodes files downloaded on 7/20/2015.',
+            'script_name': u'make_taxons.py',
+            'script_version': u'0.1'
+        }
+        self.assertEqual(ret[0], [exp])
 
     def test_get_id(self):
         ret = self.getImpl().get_id(self.getContext(), self.taxon)
-        print ret
-        self.assertEqual(ret[0],523209)
+        self.assertEqual(ret[0], 523209)
 
     def test_get_name(self):
         ret = self.getImpl().get_name(self.getContext(), self.taxon)
@@ -190,5 +224,4 @@ class taxon_apiTest(unittest.TestCase):
 
     def test_get_version(self):
         ret = self.getImpl().get_version(self.getContext(), self.taxon)
-        self.assertEqual(ret[0],'1')
-
+        self.assertEqual(ret[0], '1')

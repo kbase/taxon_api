@@ -3,4 +3,5 @@
 # TaxonAPI
 ---
 
-This is the basic readme for this module. Include any usage or deployment instructions and links to other documentation here.
+This module provides a dynamic service to interact with the Taxon objects and
+was based on the original data_api spec for the taxon object.

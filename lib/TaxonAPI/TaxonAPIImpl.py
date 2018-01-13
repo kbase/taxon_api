@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 #BEGIN_HEADER
-from biokbase.workspace.client import Workspace as workspaceService
-import doekbase.data_api.taxonomy.taxon.api
-from doekbase.data_api import cache
-import traceback
+from Workspace.WorkspaceClient import Workspace
 import logging
-from datetime import datetime
+import functools32
+# from datetime import datetime
 #END_HEADER
 
 
@@ -27,8 +25,70 @@ class TaxonAPI:
     VERSION = "0.0.2"
     GIT_URL = "git@github.com:kbase/taxon_api"
     GIT_COMMIT_HASH = "30e969aff0bd259f710e14b4468a2a73367f07cf"
-    
+
     #BEGIN_CLASS_HEADER
+    _GENOME_TYPES = ['KBaseGenomes.Genome',
+                     'KBaseGenomeAnnotations.GenomeAnnotation']
+    _TAXON_TYPES = ['KBaseGenomeAnnotations.Taxon']
+
+    @functools32.lru_cache(maxsize=1000)
+    def get_object(self, ref):
+        res = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]
+        return res
+
+    def get_data(self, ref):
+        obj = self.get_object(ref)
+        return obj['data']
+
+    @functools32.lru_cache(maxsize=1000)
+    def translate_to_MD5_types(self, ktype):
+        return self.ws.translate_to_MD5_types([ktype]).values()[0]
+
+    def get_referrers(self, ref):
+        referrers = self.ws.list_referencing_objects(
+            [{"ref": ref}])[0]
+        object_refs_by_type = dict()
+        tlist = []
+        for x in referrers:
+            tlist.append(x[2])
+        typemap = self.ws.translate_to_MD5_types(tlist)
+        for x in referrers:
+            typestring = typemap[x[2]]
+            if typestring not in object_refs_by_type:
+                object_refs_by_type[typestring] = list()
+            upa = '%d/%d/%d' % (x[6], x[0], x[4])
+            object_refs_by_type[typestring].append(upa)
+        return object_refs_by_type
+
+    def get_reffers_type(self, ref, types):
+        referrers = self.get_referrers(ref)
+        children = list()
+        for object_type in referrers:
+            if object_type.split('-')[0] in types:
+                children.extend(referrers[object_type])
+
+        return children
+
+    def make_hash(self, i):
+        omd = i[10]
+        if i[10] == {}:
+            omd = None
+
+        return {
+            'type_string': i[2],
+            'workspace_id': i[6],
+            'object_checksum': i[8],
+            'object_reference': '%d/%d' % (i[6], i[0]),
+            'object_size': i[9],
+            'saved_by': i[5],
+            'object_id': i[0],
+            'save_date': i[3],
+            'object_metadata': omd,
+            'object_name': i[1],
+            'version': i[4],
+            'workspace_name': i[7],
+            'object_reference_versioned': '%d/%d/%d' % (i[6], i[0], i[4])
+        }
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
@@ -36,41 +96,15 @@ class TaxonAPI:
     def __init__(self, config):
         #BEGIN_CONSTRUCTOR
         self.workspaceURL = config['workspace-url']
+        self.ws = Workspace(self.workspaceURL)
         self.shockURL = config['shock-url']
         self.logger = logging.getLogger()
         log_handler = logging.StreamHandler()
         log_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
         self.logger.addHandler(log_handler)
 
-
-        self.services = {
-                "workspace_service_url": self.workspaceURL,
-                "shock_service_url": self.shockURL,
-            }
-        try:
-            cache_dir = config['cache_dir']
-        except:
-            cache_dir = None
-        try:
-            redis_host = config['redis_host']
-            redis_port = config['redis_port']
-        except:
-            redis_host = None
-            redis_port = None
-        if redis_host is not None and redis_port is not None:
-            self.logger.info("Activating REDIS at host:{} port:{}".format(redis_host, redis_port))
-            cache.ObjectCache.cache_class = cache.RedisCache
-            cache.ObjectCache.cache_params = {'redis_host': redis_host, 'redis_port': redis_port}
-        elif cache_dir is not None:
-            self.logger.info("Activating File")
-            cache.ObjectCache.cache_class = cache.DBMCache
-            cache.ObjectCache.cache_params = {'path':cache_dir,'name':'data_api'}
-        else:
-            self.logger.info("Not activating REDIS")
-
         #END_CONSTRUCTOR
         pass
-    
 
     def get_parent(self, ctx, ref):
         """
@@ -82,11 +116,12 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_parent
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
+        data = self.get_data(ref)
         try:
-            returnVal=taxon_api.get_parent(ref_only=True)
+            returnVal = data['parent_taxon_ref']
+            # returnVal=taxon_api.get_parent(ref_only=True)
         except:
-            returnVal=''
+            returnVal = ''
         #END get_parent
 
         # At some point might do deeper type checking...
@@ -106,8 +141,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_children
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_children(ref_only=True)
+        returnVal = self.get_reffers_type(ref, self._TAXON_TYPES)
         #END get_children
 
         # At some point might do deeper type checking...
@@ -129,8 +163,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_genome_annotations
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_genome_annotations(ref_only=True)
+        returnVal = self.get_reffers_type(ref, self._GENOME_TYPES)
         #END get_genome_annotations
 
         # At some point might do deeper type checking...
@@ -151,8 +184,8 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_scientific_lineage
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_scientific_lineage()
+        o = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        returnVal = [x.strip() for x in o['scientific_lineage'].split(";")]
         #END get_scientific_lineage
 
         # At some point might do deeper type checking...
@@ -172,8 +205,8 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_scientific_name
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_scientific_name()
+        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        returnVal = obj['scientific_name']
         #END get_scientific_name
 
         # At some point might do deeper type checking...
@@ -194,8 +227,8 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_taxonomic_id
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_taxonomic_id()
+        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        returnVal = obj['taxonomy_id']
         #END get_taxonomic_id
 
         # At some point might do deeper type checking...
@@ -214,8 +247,8 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_kingdom
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_kingdom()
+        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        returnVal = obj['kingdom']
         #END get_kingdom
 
         # At some point might do deeper type checking...
@@ -234,8 +267,8 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_domain
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_domain()
+        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        returnVal = obj['domain']
         #END get_domain
 
         # At some point might do deeper type checking...
@@ -254,8 +287,8 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_genetic_code
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_genetic_code()
+        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        returnVal = obj['genetic_code']
         #END get_genetic_code
 
         # At some point might do deeper type checking...
@@ -274,8 +307,11 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_aliases
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_aliases()
+        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        if 'aliases' in obj:
+            returnVal = obj['aliases']
+        else:
+            returnVal = list()
         #END get_aliases
 
         # At some point might do deeper type checking...
@@ -303,8 +339,10 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_info
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_info()
+        # returnVal = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['info']
+        i = self.get_object(ref)['info']
+        #md5_typestr = self.ws.translate_to_MD5_types([i[2]]).values()[0]
+        returnVal = self.make_hash(i)
         #END get_info
 
         # At some point might do deeper type checking...
@@ -333,8 +371,10 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_history
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_history()
+        # returnVal = self.ws.get_object_history({'ref': ref})
+        returnVal = []
+        for i in self.ws.get_object_history({'ref': ref}):
+            returnVal.append(self.make_hash(i))
         #END get_history
 
         # At some point might do deeper type checking...
@@ -370,8 +410,35 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_provenance
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_provenance()
+        prov = self.ws.get_object_provenance([{"ref": ref}])[0]['provenance']
+        returnVal = []
+        copy_keys = {"time": "time",
+                     "service": "service_name",
+                     "service_ver": "service_version",
+                     "method": "service_method",
+                     "method_params": "method_parameters",
+                     "script": "script_name",
+                     "script_ver": "script_version",
+                     "script_command_line": "script_command_line",
+                     "input_ws_objects": "input_object_references",
+                     "resolved_ws_objects": "validated_object_references",
+                     "intermediate_incoming": "intermediate_input_ids",
+                     "intermediate_outgoing": "intermediate_output_ids",
+                     "external_data": "external_data",
+                     "description": "description"
+                     }
+
+        for object_provenance in prov:
+            action = dict()
+
+            for k in copy_keys:
+                if k in object_provenance:
+                    if isinstance(object_provenance[k], list) and len(object_provenance[k]) == 0:
+                        continue
+
+                    action[copy_keys[k]] = object_provenance[k]
+
+            returnVal.append(action)
         #END get_provenance
 
         # At some point might do deeper type checking...
@@ -391,8 +458,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_id
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_id()
+        returnVal = self.get_object(ref)['info'][0]
         #END get_id
 
         # At some point might do deeper type checking...
@@ -412,8 +478,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_name
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_name()
+        returnVal = self.get_object(ref)['info'][1]
         #END get_name
 
         # At some point might do deeper type checking...
@@ -433,8 +498,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_version
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], ref)
-        returnVal=taxon_api.get_version()
+        returnVal = str(self.get_object(ref)['info'][4])
         #END get_version
 
         # At some point might do deeper type checking...
@@ -478,43 +542,50 @@ class TaxonAPI:
         # return variables are: d
         #BEGIN get_all_data
         d = {}
+        ref = params['ref']
 
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], params['ref'])
+        obj = self.get_object(ref)
+        data = obj['data']
 
         try:
-            d['parent']=taxon_api.get_parent(ref_only=True)
-        except AttributeError:
-            print('Error getting parent for '+params['ref']+':\n'+ str(traceback.format_exc()))
-            d['parent']=None
+            d['parent'] = data['parent_taxon_ref']
+        except KeyError:
+            print('Error getting parent for ' + ref)
+            # +':\n'+ str(traceback.format_exc()))
+            d['parent'] = None
 
-        if 'exclude_children' in params and params['exclude_children']==1:
+        if 'exclude_children' in params and params['exclude_children'] == 1:
             pass
         else:
-            d['children']=taxon_api.get_children(ref_only=True)
+            d['children'] = self.get_reffers_type(ref, self._TAXON_TYPES)
 
-        d['scientific_lineage']=taxon_api.get_scientific_lineage()
-        d['scientific_name']=taxon_api.get_scientific_name()
-        d['taxonomic_id']=taxon_api.get_taxonomic_id()
+        d['scientific_lineage'] = data['scientific_lineage']
+        d['scientific_name'] = data['scientific_name']
+        d['taxonomic_id'] = data['taxonomy_id']
         try:
-            d['kingdom']=taxon_api.get_kingdom()
+            d['kingdom'] = data['kingdom']
             # throws error if not found, so catch and log it
-        except AttributeError as e:
-            print('Error getting kingdom for '+params['ref']+':\n'+ str(traceback.format_exc()))
-            d['kingdom']=None
+        except KeyError:
+            print('Error getting kingdom for ' + ref)
+            # +':\n'+ str(traceback.format_exc()))
+            d['kingdom'] = None
 
-        d['domain']=taxon_api.get_domain()
-        d['genetic_code']=taxon_api.get_genetic_code()
-        d['aliases']=taxon_api.get_aliases()
-        d['info']=taxon_api.get_info()
+        d['domain'] = data['domain']
+        d['genetic_code'] = data['genetic_code']
+        d['aliases'] = None
+        if 'aliases' in data:
+            d['aliases'] = data['aliases']
+        d['info'] = self.make_hash(obj['info'])
 
-        if 'include_decorated_scientific_lineage' in params and params['include_decorated_scientific_lineage']==1:
-            l = self.get_decorated_scientific_lineage(ctx, {'ref':params['ref']})[0]
+        key = 'include_decorated_scientific_lineage'
+        if key in params and params[key] == 1:
+            l = self.get_decorated_scientific_lineage(ctx, {'ref': ref})[0]
             d['decorated_scientific_lineage'] = l['decorated_scientific_lineage']
 
-        if 'include_decorated_children' in params and params['include_decorated_children']==1:
-            l = self.get_decorated_children(ctx, {'ref':params['ref']})[0]
+        key = 'include_decorated_children'
+        if key in params and params[key] == 1:
+            l = self.get_decorated_children(ctx, {'ref': ref})[0]
             d['decorated_children'] = l['decorated_children']
-
         #END get_all_data
 
         # At some point might do deeper type checking...
@@ -538,27 +609,28 @@ class TaxonAPI:
         # return variables are: returnVal
         #BEGIN get_decorated_scientific_lineage
 
-        lineageList = [];
-
-        thisTaxon = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], params['ref'])
+        lineageList = []
+        ref = params['ref']
 
         while True:
             parent_data = None
             try:
-                # note: doesn't look like there is a way to get a reference of a Taxon directly (without
-                # constructing it from object_info), so first get reference, then instantiate another API object 
-                parent_ref=thisTaxon.get_parent(ref_only=True)
+                # note: doesn't look like there is a way to get a reference
+                # of a Taxon directly (without constructing it from
+                # object_info), so first get reference, then instantiate
+                # another API object
+                parent_ref = self.get_data(ref)['parent_taxon_ref']
                 if parent_ref is not None:
-                    parent = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], parent_ref)
-                    scientific_name = parent.get_scientific_name()
+                    data = self.get_data(ref)
+                    scientific_name = data['scientific_name']
                     if scientific_name != 'root':
                         parent_data = {
                             'ref': parent_ref,
-                            'scientific_name':scientific_name
+                            'scientific_name': scientific_name
                         }
-                        thisTaxon = parent
-            
-            except AttributeError:
+                        ref = parent_ref
+
+            except KeyError:
                 # case where parent is not found
                 pass
 
@@ -567,8 +639,8 @@ class TaxonAPI:
             else:
                 break
 
-        lineageList.reverse() # reverse list to match scientific_lineage style
-        returnVal = { 'decorated_scientific_lineage': lineageList }
+        lineageList.reverse()  # reverse list to match scientific_lineage style
+        returnVal = {'decorated_scientific_lineage': lineageList[:-1]}
 
         #END get_decorated_scientific_lineage
 
@@ -591,20 +663,17 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_decorated_children
-
-        taxon_api = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], params['ref'])
-
-        children_refs=taxon_api.get_children(ref_only=True)
+        ref = params['ref']
+        children_refs = self.get_reffers_type(ref, self._TAXON_TYPES)
 
         decorated_children = []
         for child_ref in children_refs:
-            child = doekbase.data_api.taxonomy.taxon.api.TaxonAPI(self.services, ctx['token'], child_ref)
             decorated_children.append({
-                    'ref':child_ref,
-                    'scientific_name':child.get_scientific_name()
-                })
+                'ref': child_ref,
+                'scientific_name': self.get_data(ref)['scientific_name']
+            })
 
-        returnVal = { 'decorated_children': decorated_children }
+        returnVal = {'decorated_children': decorated_children}
         #END get_decorated_children
 
         # At some point might do deeper type checking...
@@ -616,7 +685,7 @@ class TaxonAPI:
 
     def status(self, ctx):
         #BEGIN_STATUS
-        returnVal = {'state': "OK", 'message': "", 'version': self.VERSION, 
+        returnVal = {'state': "OK", 'message': "", 'version': self.VERSION,
                      'git_url': self.GIT_URL, 'git_commit_hash': self.GIT_COMMIT_HASH}
         #END_STATUS
         return [returnVal]
