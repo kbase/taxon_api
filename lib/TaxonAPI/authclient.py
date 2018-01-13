@@ -8,6 +8,7 @@ A very basic KBase auth client for the Python server.
 import time as _time
 import requests as _requests
 import threading as _threading
+import hashlib
 
 
 class TokenCache(object):
@@ -23,6 +24,7 @@ class TokenCache(object):
         self._halfmax = maxsize / 2  # int division to round down
 
     def get_user(self, token):
+        token = hashlib.sha256(token).hexdigest()
         with self._lock:
             usertime = self._cache.get(token)
         if not usertime:
@@ -35,9 +37,10 @@ class TokenCache(object):
 
     def add_valid_token(self, token, user):
         if not token:
-            raise ValueError('token cannot be None')
+            raise ValueError('Must supply token')
         if not user:
-            raise ValueError('user cannot be None')
+            raise ValueError('Must supply user')
+        token = hashlib.sha256(token).hexdigest()
         with self._lock:
             self._cache[token] = [user, _time.time()]
             if len(self._cache) > self._maxsize:
@@ -54,7 +57,7 @@ class KBaseAuth(object):
     A very basic KBase auth client for the Python server.
     '''
 
-    _LOGIN_URL = 'https://kbase.us/services/authorization/Sessions/Login'
+    _LOGIN_URL = 'https://kbase.us/services/auth/api/legacy/KBase/Sessions/Login'
 
     def __init__(self, auth_url=None):
         '''
@@ -67,7 +70,7 @@ class KBaseAuth(object):
 
     def get_user(self, token):
         if not token:
-            raise ValueError('token cannot be None')
+            raise ValueError('Must supply token')
         user = self._cache.get_user(token)
         if user:
             return user
@@ -81,7 +84,7 @@ class KBaseAuth(object):
                 ret.raise_for_status()
             raise ValueError('Error connecting to auth service: {} {}\n{}'
                              .format(ret.status_code, ret.reason,
-                                     err['error_msg']))
+                                     err['error']['message']))
 
         user = ret.json()['user_id']
         self._cache.add_valid_token(token, user)

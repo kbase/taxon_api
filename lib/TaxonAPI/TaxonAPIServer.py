@@ -20,7 +20,7 @@ from TaxonAPI.authclient import KBaseAuth as _KBaseAuth
 
 DEPLOY = 'KB_DEPLOYMENT_CONFIG'
 SERVICE = 'KB_SERVICE_NAME'
-AUTH = 'auth-server-url'
+AUTH = 'auth-service-url'
 
 # Note that the error fields do not match the 2.0 JSONRPC spec
 
@@ -45,7 +45,7 @@ def get_config():
 
 config = get_config()
 
-from TaxonAPI.TaxonAPIImpl import TaxonAPI  # @IgnorePep8
+from TaxonAPI.TaxonAPIImpl import TaxonAPI  # noqa @IgnorePep8
 impl_TaxonAPI = TaxonAPI(config)
 
 
@@ -109,7 +109,11 @@ class JSONRPCServiceCustom(JSONRPCService):
             # Exception was raised inside the method.
             newerr = JSONServerError()
             newerr.trace = traceback.format_exc()
-            newerr.data = e.message
+            if isinstance(e.message, basestring):
+                newerr.data = e.message
+            else:
+                # Some exceptions embed other exceptions as the message
+                newerr.data = repr(e.message)
             raise newerr
         return result
 
@@ -171,7 +175,7 @@ class JSONRPCServiceCustom(JSONRPCService):
 
     def _handle_request(self, ctx, request):
         """Handles given request and returns its response."""
-        if self.method_data[request['method']].has_key('types'): # @IgnorePep8
+        if self.method_data[request['method']].has_key('types'):  # noqa @IgnorePep8
             self._validate_params_types(request['method'], request['params'])
 
         result = self._call_method(ctx, request)
@@ -332,79 +336,79 @@ class Application(object):
         self.rpc_service.add(impl_TaxonAPI.get_parent,
                              name='TaxonAPI.get_parent',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_parent'] = 'required'
+        self.method_authentication['TaxonAPI.get_parent'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_children,
                              name='TaxonAPI.get_children',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_children'] = 'required'
+        self.method_authentication['TaxonAPI.get_children'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_genome_annotations,
                              name='TaxonAPI.get_genome_annotations',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_genome_annotations'] = 'required'
+        self.method_authentication['TaxonAPI.get_genome_annotations'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_scientific_lineage,
                              name='TaxonAPI.get_scientific_lineage',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_scientific_lineage'] = 'required'
+        self.method_authentication['TaxonAPI.get_scientific_lineage'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_scientific_name,
                              name='TaxonAPI.get_scientific_name',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_scientific_name'] = 'required'
+        self.method_authentication['TaxonAPI.get_scientific_name'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_taxonomic_id,
                              name='TaxonAPI.get_taxonomic_id',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_taxonomic_id'] = 'required'
+        self.method_authentication['TaxonAPI.get_taxonomic_id'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_kingdom,
                              name='TaxonAPI.get_kingdom',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_kingdom'] = 'required'
+        self.method_authentication['TaxonAPI.get_kingdom'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_domain,
                              name='TaxonAPI.get_domain',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_domain'] = 'required'
+        self.method_authentication['TaxonAPI.get_domain'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_genetic_code,
                              name='TaxonAPI.get_genetic_code',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_genetic_code'] = 'required'
+        self.method_authentication['TaxonAPI.get_genetic_code'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_aliases,
                              name='TaxonAPI.get_aliases',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_aliases'] = 'required'
+        self.method_authentication['TaxonAPI.get_aliases'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_info,
                              name='TaxonAPI.get_info',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_info'] = 'required'
+        self.method_authentication['TaxonAPI.get_info'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_history,
                              name='TaxonAPI.get_history',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_history'] = 'required'
+        self.method_authentication['TaxonAPI.get_history'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_provenance,
                              name='TaxonAPI.get_provenance',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_provenance'] = 'required'
+        self.method_authentication['TaxonAPI.get_provenance'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_id,
                              name='TaxonAPI.get_id',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_id'] = 'required'
+        self.method_authentication['TaxonAPI.get_id'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_name,
                              name='TaxonAPI.get_name',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_name'] = 'required'
+        self.method_authentication['TaxonAPI.get_name'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_version,
                              name='TaxonAPI.get_version',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_version'] = 'required'
+        self.method_authentication['TaxonAPI.get_version'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_all_data,
                              name='TaxonAPI.get_all_data',
                              types=[dict])
-        self.method_authentication['TaxonAPI.get_all_data'] = 'required'
+        self.method_authentication['TaxonAPI.get_all_data'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_decorated_scientific_lineage,
                              name='TaxonAPI.get_decorated_scientific_lineage',
                              types=[dict])
-        self.method_authentication['TaxonAPI.get_decorated_scientific_lineage'] = 'required'
+        self.method_authentication['TaxonAPI.get_decorated_scientific_lineage'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_decorated_children,
                              name='TaxonAPI.get_decorated_children',
                              types=[dict])
-        self.method_authentication['TaxonAPI.get_decorated_children'] = 'required'
+        self.method_authentication['TaxonAPI.get_decorated_children'] = 'required'  # noqa
         self.rpc_service.add(impl_TaxonAPI.status,
                              name='TaxonAPI.status',
                              types=[dict])
@@ -460,7 +464,8 @@ class Application(object):
                         if token is None and auth_req == 'required':
                             err = JSONServerError()
                             err.data = (
-                                'Authentication required for TaxonAPI ' +
+                                'Authentication required for ' +
+                                'TaxonAPI ' +
                                 'but no authentication header was passed')
                             raise err
                         elif token is None and auth_req == 'optional':
@@ -492,7 +497,7 @@ class Application(object):
                            }
                     trace = jre.trace if hasattr(jre, 'trace') else None
                     rpc_result = self.process_error(err, ctx, req, trace)
-                except Exception, e:
+                except Exception:
                     err = {'error': {'code': 0,
                                      'name': 'Unexpected Server Error',
                                      'message': 'An unexpected server error ' +
@@ -502,10 +507,10 @@ class Application(object):
                     rpc_result = self.process_error(err, ctx, req,
                                                     traceback.format_exc())
 
-        # print 'The request method was %s\n' % environ['REQUEST_METHOD']
-        # print 'The environment dictionary is:\n%s\n' % pprint.pformat(environ) @IgnorePep8
-        # print 'The request body was: %s' % request_body
-        # print 'The result from the method call is:\n%s\n' % \
+        # print 'Request method was %s\n' % environ['REQUEST_METHOD']
+        # print 'Environment dictionary is:\n%s\n' % pprint.pformat(environ)
+        # print 'Request body was: %s' % request_body
+        # print 'Result from the method call is:\n%s\n' % \
         #    pprint.pformat(rpc_result)
 
         if rpc_result:
@@ -541,11 +546,12 @@ class Application(object):
         return json.dumps(error)
 
     def now_in_utc(self):
-        # Taken from http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone @IgnorePep8
+        # noqa Taken from http://stackoverflow.com/questions/3401428/how-to-get-an-isoformat-datetime-string-including-the-default-timezone @IgnorePep8
         dtnow = datetime.datetime.now()
         dtutcnow = datetime.datetime.utcnow()
         delta = dtnow - dtutcnow
-        hh, mm = divmod((delta.days * 24*60*60 + delta.seconds + 30) // 60, 60)
+        hh, mm = divmod((delta.days * 24 * 60 * 60 + delta.seconds + 30) // 60,
+                        60)
         return "%s%+02d:%02d" % (dtnow.isoformat(), hh, mm)
 
 application = Application()
@@ -574,9 +580,7 @@ try:
         print "Monkeypatching std libraries for async"
         from gevent import monkey
         monkey.patch_all()
-    uwsgi.applications = {
-        '': application
-        }
+    uwsgi.applications = {'': application}
 except ImportError:
     # Not available outside of wsgi, ignore
     pass

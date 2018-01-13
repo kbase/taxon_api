@@ -249,7 +249,8 @@ class TaxonAPI(object):
            "include_decorated_scientific_lineage" of type "boolean" (A
            boolean. 0 = false, other = true.), parameter
            "include_decorated_children" of type "boolean" (A boolean. 0 =
-           false, other = true.)
+           false, other = true.), parameter "exclude_children" of type
+           "boolean" (A boolean. 0 = false, other = true.)
         :returns: instance of type "TaxonData" -> structure: parameter
            "parent" of type "ObjectReference", parameter "children" of list
            of type "ObjectReference", parameter "decorated_children" of list

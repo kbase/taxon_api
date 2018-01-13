@@ -16,15 +16,15 @@ class TaxonAPI:
     A KBase module: TaxonAPI
     '''
 
-    ######## WARNING FOR GEVENT USERS #######
+    ######## WARNING FOR GEVENT USERS ####### noqa
     # Since asynchronous IO can lead to methods - even the same method -
     # interrupting each other, you must be *very* careful when using global
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
-    #########################################
-    VERSION = "0.0.2"
-    GIT_URL = "git@github.com:kbase/taxon_api"
-    GIT_COMMIT_HASH = "30e969aff0bd259f710e14b4468a2a73367f07cf"
+    ######################################### noqa
+    VERSION = "1.0.1"
+    GIT_URL = "git@github.com:kbase/taxon_api.git"
+    GIT_COMMIT_HASH = "de62da0a5e2d7e098927862ec0e0c09be1103f68"
 
     #BEGIN_CLASS_HEADER
     _GENOME_TYPES = ['KBaseGenomes.Genome',
@@ -105,6 +105,7 @@ class TaxonAPI:
 
         #END_CONSTRUCTOR
         pass
+
 
     def get_parent(self, ctx, ref):
         """
@@ -515,7 +516,8 @@ class TaxonAPI:
            "include_decorated_scientific_lineage" of type "boolean" (A
            boolean. 0 = false, other = true.), parameter
            "include_decorated_children" of type "boolean" (A boolean. 0 =
-           false, other = true.)
+           false, other = true.), parameter "exclude_children" of type
+           "boolean" (A boolean. 0 = false, other = true.)
         :returns: instance of type "TaxonData" -> structure: parameter
            "parent" of type "ObjectReference", parameter "children" of list
            of type "ObjectReference", parameter "decorated_children" of list
@@ -682,7 +684,6 @@ class TaxonAPI:
                              'returnVal is not type dict as required.')
         # return the results
         return [returnVal]
-
     def status(self, ctx):
         #BEGIN_STATUS
         returnVal = {'state': "OK", 'message': "", 'version': self.VERSION,
