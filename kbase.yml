@@ -11,8 +11,7 @@ module-version:
     1.0.2
 
 owners:
-    [scanon]
+    [scanon, jayrbolton]
 
 service-config:
     dynamic-service: true
-
