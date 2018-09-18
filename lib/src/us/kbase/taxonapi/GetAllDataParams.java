@@ -21,7 +21,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "ref",
     "include_decorated_scientific_lineage",
-    "include_decorated_children"
+    "include_decorated_children",
+    "exclude_children"
 })
 public class GetAllDataParams {
 
@@ -31,6 +32,8 @@ public class GetAllDataParams {
     private Long includeDecoratedScientificLineage;
     @JsonProperty("include_decorated_children")
     private Long includeDecoratedChildren;
+    @JsonProperty("exclude_children")
+    private Long excludeChildren;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("ref")
@@ -78,6 +81,21 @@ public class GetAllDataParams {
         return this;
     }
 
+    @JsonProperty("exclude_children")
+    public Long getExcludeChildren() {
+        return excludeChildren;
+    }
+
+    @JsonProperty("exclude_children")
+    public void setExcludeChildren(Long excludeChildren) {
+        this.excludeChildren = excludeChildren;
+    }
+
+    public GetAllDataParams withExcludeChildren(Long excludeChildren) {
+        this.excludeChildren = excludeChildren;
+        return this;
+    }
+
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
         return this.additionalProperties;
@@ -90,7 +108,7 @@ public class GetAllDataParams {
 
     @Override
     public String toString() {
-        return ((((((((("GetAllDataParams"+" [ref=")+ ref)+", includeDecoratedScientificLineage=")+ includeDecoratedScientificLineage)+", includeDecoratedChildren=")+ includeDecoratedChildren)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((((((((("GetAllDataParams"+" [ref=")+ ref)+", includeDecoratedScientificLineage=")+ includeDecoratedScientificLineage)+", includeDecoratedChildren=")+ includeDecoratedChildren)+", excludeChildren=")+ excludeChildren)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

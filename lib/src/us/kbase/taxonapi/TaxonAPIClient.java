@@ -179,7 +179,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<String>> retType = new TypeReference<List<String>>() {};
-        List<String> res = caller.jsonrpcCall("TaxonAPI.get_parent", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<String> res = caller.jsonrpcCall("TaxonAPI.get_parent", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -200,7 +200,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
-        List<List<String>> res = caller.jsonrpcCall("TaxonAPI.get_children", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<String>> res = caller.jsonrpcCall("TaxonAPI.get_children", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -223,7 +223,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
-        List<List<String>> res = caller.jsonrpcCall("TaxonAPI.get_genome_annotations", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<String>> res = caller.jsonrpcCall("TaxonAPI.get_genome_annotations", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -246,7 +246,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
-        List<List<String>> res = caller.jsonrpcCall("TaxonAPI.get_scientific_lineage", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<String>> res = caller.jsonrpcCall("TaxonAPI.get_scientific_lineage", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -267,7 +267,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<String>> retType = new TypeReference<List<String>>() {};
-        List<String> res = caller.jsonrpcCall("TaxonAPI.get_scientific_name", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<String> res = caller.jsonrpcCall("TaxonAPI.get_scientific_name", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -289,7 +289,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<Long>> retType = new TypeReference<List<Long>>() {};
-        List<Long> res = caller.jsonrpcCall("TaxonAPI.get_taxonomic_id", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<Long> res = caller.jsonrpcCall("TaxonAPI.get_taxonomic_id", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -309,7 +309,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<String>> retType = new TypeReference<List<String>>() {};
-        List<String> res = caller.jsonrpcCall("TaxonAPI.get_kingdom", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<String> res = caller.jsonrpcCall("TaxonAPI.get_kingdom", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -329,7 +329,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<String>> retType = new TypeReference<List<String>>() {};
-        List<String> res = caller.jsonrpcCall("TaxonAPI.get_domain", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<String> res = caller.jsonrpcCall("TaxonAPI.get_domain", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -349,7 +349,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<Long>> retType = new TypeReference<List<Long>>() {};
-        List<Long> res = caller.jsonrpcCall("TaxonAPI.get_genetic_code", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<Long> res = caller.jsonrpcCall("TaxonAPI.get_genetic_code", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -369,7 +369,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<List<String>>> retType = new TypeReference<List<List<String>>>() {};
-        List<List<String>> res = caller.jsonrpcCall("TaxonAPI.get_aliases", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<String>> res = caller.jsonrpcCall("TaxonAPI.get_aliases", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -389,7 +389,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<ObjectInfo>> retType = new TypeReference<List<ObjectInfo>>() {};
-        List<ObjectInfo> res = caller.jsonrpcCall("TaxonAPI.get_info", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<ObjectInfo> res = caller.jsonrpcCall("TaxonAPI.get_info", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -409,7 +409,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<List<ObjectInfo>>> retType = new TypeReference<List<List<ObjectInfo>>>() {};
-        List<List<ObjectInfo>> res = caller.jsonrpcCall("TaxonAPI.get_history", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<ObjectInfo>> res = caller.jsonrpcCall("TaxonAPI.get_history", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -429,7 +429,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<List<ObjectProvenanceAction>>> retType = new TypeReference<List<List<ObjectProvenanceAction>>>() {};
-        List<List<ObjectProvenanceAction>> res = caller.jsonrpcCall("TaxonAPI.get_provenance", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<List<ObjectProvenanceAction>> res = caller.jsonrpcCall("TaxonAPI.get_provenance", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -449,7 +449,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<Long>> retType = new TypeReference<List<Long>>() {};
-        List<Long> res = caller.jsonrpcCall("TaxonAPI.get_id", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<Long> res = caller.jsonrpcCall("TaxonAPI.get_id", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -469,7 +469,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<String>> retType = new TypeReference<List<String>>() {};
-        List<String> res = caller.jsonrpcCall("TaxonAPI.get_name", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<String> res = caller.jsonrpcCall("TaxonAPI.get_name", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -489,7 +489,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(ref);
         TypeReference<List<String>> retType = new TypeReference<List<String>>() {};
-        List<String> res = caller.jsonrpcCall("TaxonAPI.get_version", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<String> res = caller.jsonrpcCall("TaxonAPI.get_version", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -506,7 +506,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<TaxonData>> retType = new TypeReference<List<TaxonData>>() {};
-        List<TaxonData> res = caller.jsonrpcCall("TaxonAPI.get_all_data", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<TaxonData> res = caller.jsonrpcCall("TaxonAPI.get_all_data", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -523,7 +523,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<DecoratedScientificLineage>> retType = new TypeReference<List<DecoratedScientificLineage>>() {};
-        List<DecoratedScientificLineage> res = caller.jsonrpcCall("TaxonAPI.get_decorated_scientific_lineage", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<DecoratedScientificLineage> res = caller.jsonrpcCall("TaxonAPI.get_decorated_scientific_lineage", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
@@ -540,7 +540,7 @@ public class TaxonAPIClient {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
         TypeReference<List<DecoratedChildren>> retType = new TypeReference<List<DecoratedChildren>>() {};
-        List<DecoratedChildren> res = caller.jsonrpcCall("TaxonAPI.get_decorated_children", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        List<DecoratedChildren> res = caller.jsonrpcCall("TaxonAPI.get_decorated_children", args, retType, true, false, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 

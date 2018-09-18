@@ -81,20 +81,19 @@ sub new
     # We create an auth token, passing through the arguments that we were (hopefully) given.
 
     {
-	my $token = Bio::KBase::AuthToken->new(@args);
-	
-	if (!$token->error_message)
-	{
-	    $self->{token} = $token->token;
-	    $self->{client}->{token} = $token->token;
+	my %arg_hash2 = @args;
+	if (exists $arg_hash2{"token"}) {
+	    $self->{token} = $arg_hash2{"token"};
+	} elsif (exists $arg_hash2{"user_id"}) {
+	    my $token = Bio::KBase::AuthToken->new(@args);
+	    if (!$token->error_message) {
+	        $self->{token} = $token->token;
+	    }
 	}
-        else
-        {
-	    #
-	    # All methods in this module require authentication. In this case, if we
-	    # don't have a token, we can't continue.
-	    #
-	    die "Authentication failed: " . $token->error_message;
+	
+	if (exists $self->{token})
+	{
+	    $self->{client}->{token} = $self->{token};
 	}
     }
 
@@ -151,7 +150,7 @@ Retrieve parent Taxon.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -237,7 +236,7 @@ Retrieve children Taxon.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -325,7 +324,7 @@ funcdef GenomeAnnotation(s) that refer to this Taxon.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -412,7 +411,7 @@ Retrieve the scientific lineage.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -498,7 +497,7 @@ Retrieve the scientific name.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -585,7 +584,7 @@ For type KBaseGenomes.Genome, the ``source_id`` will be returned.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -669,7 +668,7 @@ Retrieve the kingdom.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -753,7 +752,7 @@ Retrieve the domain.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -837,7 +836,7 @@ Retrieve the genetic code.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -921,7 +920,7 @@ Retrieve the aliases.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1034,7 +1033,7 @@ Retrieve object info.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1149,7 +1148,7 @@ Retrieve object history.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1282,7 +1281,7 @@ Retrieve object provenance.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1367,7 +1366,7 @@ Retrieve object identifier.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1452,7 +1451,7 @@ Retrieve object name.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1537,7 +1536,7 @@ Retrieve object version.
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1598,6 +1597,7 @@ GetAllDataParams is a reference to a hash where the following keys are defined:
 	ref has a value which is a TaxonAPI.ObjectReference
 	include_decorated_scientific_lineage has a value which is a TaxonAPI.boolean
 	include_decorated_children has a value which is a TaxonAPI.boolean
+	exclude_children has a value which is a TaxonAPI.boolean
 ObjectReference is a string
 boolean is an int
 TaxonData is a reference to a hash where the following keys are defined:
@@ -1643,6 +1643,7 @@ GetAllDataParams is a reference to a hash where the following keys are defined:
 	ref has a value which is a TaxonAPI.ObjectReference
 	include_decorated_scientific_lineage has a value which is a TaxonAPI.boolean
 	include_decorated_children has a value which is a TaxonAPI.boolean
+	exclude_children has a value which is a TaxonAPI.boolean
 ObjectReference is a string
 boolean is an int
 TaxonData is a reference to a hash where the following keys are defined:
@@ -1691,7 +1692,7 @@ ObjectInfo is a reference to a hash where the following keys are defined:
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1789,7 +1790,7 @@ TaxonInfo is a reference to a hash where the following keys are defined:
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -1887,7 +1888,7 @@ TaxonInfo is a reference to a hash where the following keys are defined:
 {
     my($self, @args) = @_;
 
-# Authentication: required
+# Authentication: optional
 
     if ((my $n = @args) != 1)
     {
@@ -2319,6 +2320,7 @@ a reference to a hash where the following keys are defined:
 ref has a value which is a TaxonAPI.ObjectReference
 include_decorated_scientific_lineage has a value which is a TaxonAPI.boolean
 include_decorated_children has a value which is a TaxonAPI.boolean
+exclude_children has a value which is a TaxonAPI.boolean
 
 </pre>
 
@@ -2330,6 +2332,7 @@ a reference to a hash where the following keys are defined:
 ref has a value which is a TaxonAPI.ObjectReference
 include_decorated_scientific_lineage has a value which is a TaxonAPI.boolean
 include_decorated_children has a value which is a TaxonAPI.boolean
+exclude_children has a value which is a TaxonAPI.boolean
 
 
 =end text
