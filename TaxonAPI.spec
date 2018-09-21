@@ -66,14 +66,14 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
      *
      * @return Reference to parent Taxon.
      */
-     funcdef get_parent( ObjectReference ref)  returns (ObjectReference) authentication required;
+     funcdef get_parent( ObjectReference ref)  returns (ObjectReference) authentication optional;
 
     /**
      * Retrieve children Taxon.
      *
      * @return List of references to child Taxons.
      */
-     funcdef get_children( ObjectReference ref)  returns (list<ObjectReference>) authentication required;
+     funcdef get_children( ObjectReference ref)  returns (list<ObjectReference>) authentication optional;
 
     /**
      funcdef GenomeAnnotation(s) that refer to this Taxon.
@@ -82,7 +82,7 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
      *
      * @return List of references to GenomeAnnotation objects.
      */
-     funcdef get_genome_annotations( ObjectReference ref)  returns (list<ObjectReference>) authentication required;
+     funcdef get_genome_annotations( ObjectReference ref)  returns (list<ObjectReference>) authentication optional;
 
     /**
      * Retrieve the scientific lineage.
@@ -91,14 +91,14 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
      *   the usual way from Domain to Kingdom to Phylum, etc.
      *
      */
-     funcdef get_scientific_lineage( ObjectReference ref)  returns (list<string>) authentication required;
+     funcdef get_scientific_lineage( ObjectReference ref)  returns (list<string>) authentication optional;
 
     /**
      * Retrieve the scientific name.
      *
      * @return The scientific name, e.g., "Escherichia Coli K12 str. MG1655"
      */
-     funcdef get_scientific_name( ObjectReference ref)  returns (string) authentication required;
+     funcdef get_scientific_name( ObjectReference ref)  returns (string) authentication optional;
 
     /**
      * Retrieve the NCBI taxonomic ID of this Taxon.
@@ -106,67 +106,67 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
      *
      * @return Integer taxonomic ID.
      */
-     funcdef get_taxonomic_id( ObjectReference ref)  returns (int) authentication required;
+     funcdef get_taxonomic_id( ObjectReference ref)  returns (int) authentication optional;
 
     /**
      * Retrieve the kingdom.
      *
      */
-     funcdef get_kingdom( ObjectReference ref)  returns (string) authentication required;
+     funcdef get_kingdom( ObjectReference ref)  returns (string) authentication optional;
 
     /**
      * Retrieve the domain.
      *
      */
-     funcdef get_domain( ObjectReference ref)  returns (string) authentication required;
+     funcdef get_domain( ObjectReference ref)  returns (string) authentication optional;
 
     /**
      * Retrieve the genetic code.
      *
      */
-     funcdef get_genetic_code( ObjectReference ref)  returns (int) authentication required;
+     funcdef get_genetic_code( ObjectReference ref)  returns (int) authentication optional;
 
     /**
      * Retrieve the aliases.
      *
      */
-     funcdef get_aliases( ObjectReference ref)  returns (list<string>) authentication required;
+     funcdef get_aliases( ObjectReference ref)  returns (list<string>) authentication optional;
 
     /**
      * Retrieve object info.
      * @skip documentation
      */
-     funcdef get_info( ObjectReference ref)  returns (ObjectInfo) authentication required;
+     funcdef get_info( ObjectReference ref)  returns (ObjectInfo) authentication optional;
 
     /**
      * Retrieve object history.
      * @skip documentation
      */
-     funcdef get_history( ObjectReference ref)  returns (ObjectHistory) authentication required;
+     funcdef get_history( ObjectReference ref)  returns (ObjectHistory) authentication optional;
 
     /**
      * Retrieve object provenance.
      * @skip documentation
      */
-     funcdef get_provenance( ObjectReference ref)  returns (ObjectProvenance) authentication required;
+     funcdef get_provenance( ObjectReference ref)  returns (ObjectProvenance) authentication optional;
 
     /**
      * Retrieve object identifier.
      * @skip documentation
      */
-     funcdef get_id( ObjectReference ref)  returns (int) authentication required;
+     funcdef get_id( ObjectReference ref)  returns (int) authentication optional;
 
     /**
      * Retrieve object name.
      * @skip documentation
      */
-     funcdef get_name( ObjectReference ref)  returns (string) authentication required;
+     funcdef get_name( ObjectReference ref)  returns (string) authentication optional;
 
     /**
      * Retrieve object version.
      * @skip documentation
      */
-     funcdef get_version( ObjectReference ref)  returns (string) authentication required;
+     funcdef get_version( ObjectReference ref)  returns (string) authentication optional;
 
 
      typedef structure {
@@ -203,7 +203,7 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
      } TaxonData;
 
      funcdef get_all_data( GetAllDataParams params )
-                    returns (TaxonData d) authentication required;
+                    returns (TaxonData d) authentication optional;
 
     typedef structure {
         ObjectReference ref;
@@ -215,7 +215,7 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
      } DecoratedScientificLineage;
 
      funcdef get_decorated_scientific_lineage(GetDecoratedScientificLineageParams params)
-                    returns (DecoratedScientificLineage) authentication required;
+                    returns (DecoratedScientificLineage) authentication optional;
 
     typedef structure {
         ObjectReference ref;
@@ -226,6 +226,6 @@ typedef list<ObjectProvenanceAction> ObjectProvenance;
      } DecoratedChildren;
 
      funcdef get_decorated_children(GetDecoratedChildrenParams params)
-                    returns (DecoratedChildren) authentication required;
+                    returns (DecoratedChildren) authentication optional;
 
 };

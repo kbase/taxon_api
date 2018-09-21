@@ -22,9 +22,9 @@ class TaxonAPI:
     # state. A method could easily clobber the state set by another while
     # the latter method is running.
     ######################################### noqa
-    VERSION = "1.0.1"
-    GIT_URL = "git@github.com:kbase/taxon_api.git"
-    GIT_COMMIT_HASH = "de62da0a5e2d7e098927862ec0e0c09be1103f68"
+    VERSION = "1.0.2"
+    GIT_URL = ""
+    GIT_COMMIT_HASH = "5b8cdf63a676a609ea4f180891cf75006640f148"
 
     #BEGIN_CLASS_HEADER
     _GENOME_TYPES = ['KBaseGenomes.Genome',

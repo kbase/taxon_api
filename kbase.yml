@@ -8,11 +8,10 @@ service-language:
     python
 
 module-version:
-    1.0.2
+    1.0.3
 
 owners:
-    [scanon]
+    [scanon, jayrbolton]
 
 service-config:
     dynamic-service: true
-

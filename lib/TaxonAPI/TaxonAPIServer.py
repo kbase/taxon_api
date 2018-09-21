@@ -336,79 +336,79 @@ class Application(object):
         self.rpc_service.add(impl_TaxonAPI.get_parent,
                              name='TaxonAPI.get_parent',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_parent'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_parent'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_children,
                              name='TaxonAPI.get_children',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_children'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_children'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_genome_annotations,
                              name='TaxonAPI.get_genome_annotations',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_genome_annotations'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_genome_annotations'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_scientific_lineage,
                              name='TaxonAPI.get_scientific_lineage',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_scientific_lineage'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_scientific_lineage'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_scientific_name,
                              name='TaxonAPI.get_scientific_name',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_scientific_name'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_scientific_name'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_taxonomic_id,
                              name='TaxonAPI.get_taxonomic_id',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_taxonomic_id'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_taxonomic_id'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_kingdom,
                              name='TaxonAPI.get_kingdom',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_kingdom'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_kingdom'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_domain,
                              name='TaxonAPI.get_domain',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_domain'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_domain'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_genetic_code,
                              name='TaxonAPI.get_genetic_code',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_genetic_code'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_genetic_code'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_aliases,
                              name='TaxonAPI.get_aliases',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_aliases'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_aliases'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_info,
                              name='TaxonAPI.get_info',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_info'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_info'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_history,
                              name='TaxonAPI.get_history',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_history'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_history'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_provenance,
                              name='TaxonAPI.get_provenance',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_provenance'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_provenance'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_id,
                              name='TaxonAPI.get_id',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_id'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_id'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_name,
                              name='TaxonAPI.get_name',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_name'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_name'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_version,
                              name='TaxonAPI.get_version',
                              types=[basestring])
-        self.method_authentication['TaxonAPI.get_version'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_version'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_all_data,
                              name='TaxonAPI.get_all_data',
                              types=[dict])
-        self.method_authentication['TaxonAPI.get_all_data'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_all_data'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_decorated_scientific_lineage,
                              name='TaxonAPI.get_decorated_scientific_lineage',
                              types=[dict])
-        self.method_authentication['TaxonAPI.get_decorated_scientific_lineage'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_decorated_scientific_lineage'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_decorated_children,
                              name='TaxonAPI.get_decorated_children',
                              types=[dict])
-        self.method_authentication['TaxonAPI.get_decorated_children'] = 'required'  # noqa
+        self.method_authentication['TaxonAPI.get_decorated_children'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.status,
                              name='TaxonAPI.status',
                              types=[dict])
