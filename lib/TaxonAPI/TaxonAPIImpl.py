@@ -31,16 +31,19 @@ class TaxonAPI:
                      'KBaseGenomeAnnotations.GenomeAnnotation']
     _TAXON_TYPES = ['KBaseGenomeAnnotations.Taxon']
 
-    @functools32.lru_cache(maxsize=1000)
-    def get_object(self, ref):
-        res = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]
+    @functools32.lru_cache(maxsize=1024)
+    def get_object(self, ref, no_data=False):
+        res = self.ws.get_objects2({
+            'objects': [{'ref': ref}],
+            'no_data': 1 if no_data else 0
+        })['data'][0]
         return res
 
     def get_data(self, ref):
         obj = self.get_object(ref)
         return obj['data']
 
-    @functools32.lru_cache(maxsize=1000)
+    @functools32.lru_cache(maxsize=1024)
     def translate_to_MD5_types(self, ktype):
         return self.ws.translate_to_MD5_types([ktype]).values()[0]
 
@@ -118,11 +121,7 @@ class TaxonAPI:
         # return variables are: returnVal
         #BEGIN get_parent
         data = self.get_data(ref)
-        try:
-            returnVal = data['parent_taxon_ref']
-            # returnVal=taxon_api.get_parent(ref_only=True)
-        except:
-            returnVal = ''
+        returnVal = data.get('parent_taxon_ref', '')
         #END get_parent
 
         # At some point might do deeper type checking...
@@ -185,7 +184,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_scientific_lineage
-        o = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        o = self.get_data(ref)
         returnVal = [x.strip() for x in o['scientific_lineage'].split(";")]
         #END get_scientific_lineage
 
@@ -206,7 +205,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_scientific_name
-        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        obj = self.get_data(ref)
         returnVal = obj['scientific_name']
         #END get_scientific_name
 
@@ -228,7 +227,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_taxonomic_id
-        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        obj = self.get_data(ref)
         returnVal = obj['taxonomy_id']
         #END get_taxonomic_id
 
@@ -248,7 +247,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_kingdom
-        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        obj = self.get_data(ref)
         returnVal = obj['kingdom']
         #END get_kingdom
 
@@ -268,7 +267,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_domain
-        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        obj = self.get_data(ref)
         returnVal = obj['domain']
         #END get_domain
 
@@ -288,7 +287,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_genetic_code
-        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
+        obj = self.get_data(ref)
         returnVal = obj['genetic_code']
         #END get_genetic_code
 
@@ -308,11 +307,8 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_aliases
-        obj = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['data']
-        if 'aliases' in obj:
-            returnVal = obj['aliases']
-        else:
-            returnVal = list()
+        obj = self.get_data(ref)
+        returnVal = obj.get('aliases', [])
         #END get_aliases
 
         # At some point might do deeper type checking...
@@ -340,9 +336,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_info
-        # returnVal = self.ws.get_objects2({'objects': [{'ref': ref}]})['data'][0]['info']
-        i = self.get_object(ref)['info']
-        #md5_typestr = self.ws.translate_to_MD5_types([i[2]]).values()[0]
+        i = self.get_object(ref, no_data=True)['info']
         returnVal = self.make_hash(i)
         #END get_info
 
@@ -459,7 +453,10 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_id
-        returnVal = self.get_object(ref)['info'][0]
+        pieces = ref.split('/')
+        if len(pieces) != 2 and len(pieces) != 3:
+            raise ValueError(f'Invalid workspace reference: {ref}')
+        returnVal = pieces[1]
         #END get_id
 
         # At some point might do deeper type checking...
@@ -479,7 +476,7 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_name
-        returnVal = self.get_object(ref)['info'][1]
+        returnVal = self.get_object(ref, no_data=True)['info'][1]
         #END get_name
 
         # At some point might do deeper type checking...
@@ -499,7 +496,13 @@ class TaxonAPI:
         # ctx is the context object
         # return variables are: returnVal
         #BEGIN get_version
-        returnVal = str(self.get_object(ref)['info'][4])
+        pieces = ref.split('/')
+        if len(pieces == 2):
+            returnVal = str(self.get_object(ref)['info'][4], no_data=True)
+        elif len(pieces == 3):
+            returnVal = pieces[2]
+        else:
+            raise ValueError(f'Invalid workspace reference: {ref}')
         #END get_version
 
         # At some point might do deeper type checking...
