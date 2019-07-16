@@ -2,7 +2,7 @@ import unittest
 import time
 
 from os import environ
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 
 from biokbase.workspace.client import Workspace as workspaceService
 from TaxonAPI.TaxonAPIImpl import TaxonAPI
