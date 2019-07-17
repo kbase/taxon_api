@@ -1,22 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from wsgiref.simple_server import make_server
-import sys
-import json
-import traceback
 import datetime
-from multiprocessing import Process
+import json
+import os
+import random as _random
+import sys
+import traceback
 from getopt import getopt, GetoptError
-from jsonrpcbase import JSONRPCService, InvalidParamsError, KeywordError,\
+from multiprocessing import Process
+from os import environ
+from wsgiref.simple_server import make_server
+
+import requests as _requests
+from jsonrpcbase import JSONRPCService, InvalidParamsError, KeywordError, \
     JSONRPCError, InvalidRequestError
 from jsonrpcbase import ServerError as JSONServerError
-from os import environ
-from ConfigParser import ConfigParser
+
 from biokbase import log
-import requests as _requests
-import random as _random
-import os
 from TaxonAPI.authclient import KBaseAuth as _KBaseAuth
+
+try:
+    from ConfigParser import ConfigParser
+except ImportError:
+    from configparser import ConfigParser
 
 DEPLOY = 'KB_DEPLOYMENT_CONFIG'
 SERVICE = 'KB_SERVICE_NAME'
@@ -109,11 +115,10 @@ class JSONRPCServiceCustom(JSONRPCService):
             # Exception was raised inside the method.
             newerr = JSONServerError()
             newerr.trace = traceback.format_exc()
-            if isinstance(e.message, basestring):
-                newerr.data = e.message
+            if len(e.args) == 1:
+                newerr.data = repr(e.args[0])
             else:
-                # Some exceptions embed other exceptions as the message
-                newerr.data = repr(e.message)
+                newerr.data = repr(e.args)
             raise newerr
         return result
 
@@ -175,7 +180,7 @@ class JSONRPCServiceCustom(JSONRPCService):
 
     def _handle_request(self, ctx, request):
         """Handles given request and returns its response."""
-        if self.method_data[request['method']].has_key('types'):  # noqa @IgnorePep8
+        if 'types' in self.method_data[request['method']]:
             self._validate_params_types(request['method'], request['params'])
 
         result = self._call_method(ctx, request)
@@ -335,67 +340,67 @@ class Application(object):
         self.method_authentication = dict()
         self.rpc_service.add(impl_TaxonAPI.get_parent,
                              name='TaxonAPI.get_parent',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_parent'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_children,
                              name='TaxonAPI.get_children',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_children'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_genome_annotations,
                              name='TaxonAPI.get_genome_annotations',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_genome_annotations'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_scientific_lineage,
                              name='TaxonAPI.get_scientific_lineage',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_scientific_lineage'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_scientific_name,
                              name='TaxonAPI.get_scientific_name',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_scientific_name'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_taxonomic_id,
                              name='TaxonAPI.get_taxonomic_id',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_taxonomic_id'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_kingdom,
                              name='TaxonAPI.get_kingdom',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_kingdom'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_domain,
                              name='TaxonAPI.get_domain',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_domain'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_genetic_code,
                              name='TaxonAPI.get_genetic_code',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_genetic_code'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_aliases,
                              name='TaxonAPI.get_aliases',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_aliases'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_info,
                              name='TaxonAPI.get_info',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_info'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_history,
                              name='TaxonAPI.get_history',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_history'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_provenance,
                              name='TaxonAPI.get_provenance',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_provenance'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_id,
                              name='TaxonAPI.get_id',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_id'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_name,
                              name='TaxonAPI.get_name',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_name'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_version,
                              name='TaxonAPI.get_version',
-                             types=[basestring])
+                             types=[str])
         self.method_authentication['TaxonAPI.get_version'] = 'optional'  # noqa
         self.rpc_service.add(impl_TaxonAPI.get_all_data,
                              name='TaxonAPI.get_all_data',
@@ -476,7 +481,7 @@ class Application(object):
                                 ctx['user_id'] = user
                                 ctx['authenticated'] = 1
                                 ctx['token'] = token
-                            except Exception, e:
+                            except Exception as e:
                                 if auth_req == 'required':
                                     err = JSONServerError()
                                     err.data = \
@@ -507,11 +512,11 @@ class Application(object):
                     rpc_result = self.process_error(err, ctx, req,
                                                     traceback.format_exc())
 
-        # print 'Request method was %s\n' % environ['REQUEST_METHOD']
-        # print 'Environment dictionary is:\n%s\n' % pprint.pformat(environ)
-        # print 'Request body was: %s' % request_body
-        # print 'Result from the method call is:\n%s\n' % \
-        #    pprint.pformat(rpc_result)
+        # print('Request method was %s\n' % environ['REQUEST_METHOD'])
+        # print('Environment dictionary is:\n%s\n' % pprint.pformat(environ))
+        # print('Request body was: %s' % request_body)
+        # print('Result from the method call is:\n%s\n' % \
+        #    pprint.pformat(rpc_result))
 
         if rpc_result:
             response_body = rpc_result
@@ -525,7 +530,7 @@ class Application(object):
             ('content-type', 'application/json'),
             ('content-length', str(len(response_body)))]
         start_response(status, response_headers)
-        return [response_body]
+        return [response_body.encode('utf8')]
 
     def process_error(self, error, context, request, trace=None):
         if trace:
@@ -577,7 +582,7 @@ try:
 # a wsgi container that has enabled gevent, such as
 # uwsgi with the --gevent option
     if config is not None and config.get('gevent_monkeypatch_all', False):
-        print "Monkeypatching std libraries for async"
+        print("Monkeypatching std libraries for async")
         from gevent import monkey
         monkey.patch_all()
     uwsgi.applications = {'': application}
@@ -601,7 +606,7 @@ def start_server(host='localhost', port=0, newprocess=False):
         raise RuntimeError('server is already running')
     httpd = make_server(host, port, application)
     port = httpd.server_address[1]
-    print "Listening on port %s" % port
+    print("Listening on port %s" % port)
     if newprocess:
         _proc = Process(target=httpd.serve_forever)
         _proc.daemon = True
@@ -680,7 +685,7 @@ if __name__ == "__main__":
         opts, args = getopt(sys.argv[1:], "", ["port=", "host="])
     except GetoptError as err:
         # print help information and exit:
-        print str(err)  # will print something like "option -a not recognized"
+        print(str(err))  # will print something like "option -a not recognized"
         sys.exit(2)
     port = 9999
     host = 'localhost'
@@ -689,12 +694,12 @@ if __name__ == "__main__":
             port = int(a)
         elif o == '--host':
             host = a
-            print "Host set to %s" % host
+            print("Host set to %s" % host)
         else:
             assert False, "unhandled option"
 
     start_server(host=host, port=port)
-#    print "Listening on port %s" % port
+#    print("Listening on port %s" % port)
 #    httpd = make_server( host, port, application)
 #
 #    httpd.serve_forever()
