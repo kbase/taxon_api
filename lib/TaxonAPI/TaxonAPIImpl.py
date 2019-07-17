@@ -48,8 +48,8 @@ class TaxonAPI:
         return self.ws.translate_to_MD5_types([ktype]).values()[0]
 
     def get_referrers(self, ref):
-        referrers = self.ws.list_referencing_objects(
-            [{"ref": ref}])[0]
+        """Fetch all objects that have a reference to the given object."""
+        referrers = self.ws.list_referencing_objects([{"ref": ref}])[0]
         object_refs_by_type = dict()
         tlist = []
         for x in referrers:
@@ -69,14 +69,13 @@ class TaxonAPI:
         for object_type in referrers:
             if object_type.split('-')[0] in types:
                 children.extend(referrers[object_type])
-
         return children
 
-    def make_hash(self, i):
+    def info_dict(self, i):
+        """Convert the object info tuple into a dictionary with keys."""
         omd = i[10]
         if i[10] == {}:
             omd = None
-
         return {
             'type_string': i[2],
             'workspace_id': i[6],
@@ -92,6 +91,15 @@ class TaxonAPI:
             'workspace_name': i[7],
             'object_reference_versioned': '%d/%d/%d' % (i[6], i[0], i[4])
         }
+
+    def _iterate_lineage(self, start_ref):
+        """Generate ancestor taxa going up from a starting point."""
+        obj = self.get_object(start_ref)
+        yield (start_ref, obj)
+        while obj['data'].get('parent_taxon_ref'):
+            ref = obj['data']['parent_taxon_ref']
+            obj = self.get_object(ref)
+            yield (ref, obj)
     #END_CLASS_HEADER
 
     # config contains contents of config file in a hash or None if it couldn't
@@ -337,7 +345,7 @@ class TaxonAPI:
         # return variables are: returnVal
         #BEGIN get_info
         i = self.get_object(ref, no_data=True)['info']
-        returnVal = self.make_hash(i)
+        returnVal = self.info_dict(i)
         #END get_info
 
         # At some point might do deeper type checking...
@@ -369,7 +377,7 @@ class TaxonAPI:
         # returnVal = self.ws.get_object_history({'ref': ref})
         returnVal = []
         for i in self.ws.get_object_history({'ref': ref}):
-            returnVal.append(self.make_hash(i))
+            returnVal.append(self.info_dict(i))
         #END get_history
 
         # At some point might do deeper type checking...
@@ -456,7 +464,10 @@ class TaxonAPI:
         pieces = ref.split('/')
         if len(pieces) != 2 and len(pieces) != 3:
             raise ValueError(f'Invalid workspace reference: {ref}')
-        returnVal = int(pieces[1])
+        try:
+            returnVal = int(pieces[1])
+        except ValueError:
+            returnVal = self.get_object(ref, no_data=True)['info'][0]
         #END get_id
 
         # At some point might do deeper type checking...
@@ -580,7 +591,7 @@ class TaxonAPI:
         d['aliases'] = None
         if 'aliases' in data:
             d['aliases'] = data['aliases']
-        d['info'] = self.make_hash(obj['info'])
+        d['info'] = self.info_dict(obj['info'])
 
         key = 'include_decorated_scientific_lineage'
         if key in params and params[key] == 1:
@@ -614,38 +625,18 @@ class TaxonAPI:
         # return variables are: returnVal
         #BEGIN get_decorated_scientific_lineage
 
-        lineageList = []
+        lineage_list = []
         ref = params['ref']
-
-        while True:
-            parent_data = None
-            try:
-                # note: doesn't look like there is a way to get a reference
-                # of a Taxon directly (without constructing it from
-                # object_info), so first get reference, then instantiate
-                # another API object
-                parent_ref = self.get_data(ref)['parent_taxon_ref']
-                if parent_ref is not None:
-                    data = self.get_data(ref)
-                    scientific_name = data['scientific_name']
-                    if scientific_name != 'root':
-                        parent_data = {
-                            'ref': parent_ref,
-                            'scientific_name': scientific_name
-                        }
-                        ref = parent_ref
-
-            except KeyError:
-                # case where parent is not found
-                pass
-
-            if parent_data is not None:
-                lineageList.append(parent_data)
-            else:
+        for (parent_ref, parent) in self._iterate_lineage(ref):
+            sci_name = parent['data'].get('scientific_name')
+            if sci_name == 'root':
                 break
-
-        lineageList.reverse()  # reverse list to match scientific_lineage style
-        returnVal = {'decorated_scientific_lineage': lineageList[:-1]}
+            lineage_list.append({
+                'ref': parent_ref,
+                'scientific_name': sci_name
+            })
+        lineage_list.reverse()  # reverse list to match scientific_lineage style
+        returnVal = {'decorated_scientific_lineage': lineage_list[:-1]}
 
         #END get_decorated_scientific_lineage
 
@@ -670,12 +661,12 @@ class TaxonAPI:
         #BEGIN get_decorated_children
         ref = params['ref']
         children_refs = self.get_reffers_type(ref, self._TAXON_TYPES)
-
         decorated_children = []
         for child_ref in children_refs:
+            child_data = self.get_data(child_ref)
             decorated_children.append({
                 'ref': child_ref,
-                'scientific_name': self.get_data(child_ref)['scientific_name']
+                'scientific_name': child_data.get('scientific_name')
             })
 
         returnVal = {'decorated_children': decorated_children}
