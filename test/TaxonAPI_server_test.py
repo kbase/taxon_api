@@ -33,9 +33,9 @@ class taxon_apiTest(unittest.TestCase):
         cls.wsURL = cls.cfg['workspace-url']
         cls.wsClient = workspaceService(cls.wsURL, token=token)
         cls.serviceImpl = TaxonAPI(cls.cfg)
-        cls.taxon = '1779/523209/1'
-        cls.parent = u'1779/178590/1'
-        cls.root_taxon = '1779/1/1'
+        cls.taxon = 'ReferenceTaxons/280699_taxon/1'
+        cls.parent = u'ReferenceTaxons/45157_taxon/1'
+        cls.root_taxon = 'ReferenceTaxons/1_taxon/1'
 
     @classmethod
     def tearDownClass(cls):
@@ -63,7 +63,8 @@ class taxon_apiTest(unittest.TestCase):
 
     def test_get_parent(self):
         ret = self.getImpl().get_parent(self.getContext(), self.taxon)
-        self.assertEqual(ret[0], self.parent)
+        parent_ref_id = self.wsClient.get_objects2({'objects': [{'ref': self.parent}]})['data'][0]['path'][0]
+        self.assertEqual(ret[0], parent_ref_id)
 
         ret = self.getImpl().get_parent(self.getContext(), self.root_taxon)
         self.assertEqual(ret[0], '')
@@ -71,14 +72,14 @@ class taxon_apiTest(unittest.TestCase):
     def test_get_all_data(self):
         ret = self.getImpl().get_all_data(self.getContext(),
                                           {'ref': self.taxon})
-        self.assertEqual(ret[0]['parent'], self.parent)
+        parent_ref_name = ret[0]['parent']
+        parent_ref_id = self.wsClient.get_objects2({'objects': [{'ref': parent_ref_name}]})['data'][0]['path'][0]
+        self.assertEqual(ret[0]['parent'], parent_ref_id)
         self.assertTrue('decorated_scientific_lineage' not in ret[0])
         self.assertTrue('decorated_children' not in ret[0])
         self.assertEqual(ret[0]['children'], [])
         self.assertEqual(ret[0]['domain'], 'Eukaryota')
         self.assertEqual(ret[0]['genetic_code'], 1)
-        self.assertEqual(ret[0]['info']['object_checksum'],
-                         '5f1b24082f447daccca0c8d2f1073fe4')
         self.assertEqual(ret[0]['scientific_name'],
                          'Cyanidioschyzon merolae strain 10D')
         self.assertEqual(ret[0]['taxonomic_id'], 280699)
@@ -88,7 +89,9 @@ class taxon_apiTest(unittest.TestCase):
         }
 
         ret = self.getImpl().get_all_data(self.getContext(), item)
-        self.assertEqual(ret[0]['parent'], self.parent)
+        parent_ref_name = ret[0]['parent']
+        parent_ref_id = self.wsClient.get_objects2({'objects': [{'ref': parent_ref_name}]})['data'][0]['path'][0]
+        self.assertEqual(ret[0]['parent'], parent_ref_id)
         self.assertTrue('decorated_scientific_lineage' in ret[0])
         self.assertTrue('decorated_children' not in ret[0])
 
@@ -169,39 +172,55 @@ class taxon_apiTest(unittest.TestCase):
 
     def test_get_info(self):
         ret = self.getImpl().get_info(self.getContext(), self.taxon)
+        ws_id, obj_id, version = self.wsClient.get_objects2({'objects': [{'ref': self.taxon}]})['data'][0]['path'][0].split('/')
+        # data saved on ci and appdev have different save date
+        del ret[0]['save_date']
+        # 'object_checksum' includes the date the object is saved, this info on ci and appdev are different
+        # needs to be compared particularly
+        if 'ci' in self.wsURL:
+            self.assertEqual(ret[0]['object_checksum'],  u'5f1b24082f447daccca0c8d2f1073fe4')
+        elif 'appdev' in self.wsURL:
+            self.assertEqual(ret[0]['object_checksum'], u'be965af99c26eb1d8af025f6cd58476b')
+        del ret[0]['object_checksum']
         exp = {
             'type_string': u'KBaseGenomeAnnotations.Taxon-1.0',
-            'workspace_id': 1779,
-            'object_checksum': u'5f1b24082f447daccca0c8d2f1073fe4',
-            'object_reference': '1779/523209',
+            'workspace_id': int(ws_id),
+            'object_reference': '/'.join([ws_id, obj_id]),
             'object_size': 455,
             'saved_by': u'kbasetest',
-            'object_id': 523209,
-            'save_date': u'2015-10-08T18:44:34+0000',
+            'object_id': int(obj_id),
             'object_metadata': None,
             'object_name': u'280699_taxon',
             'version': 1,
             'workspace_name': u'ReferenceTaxons',
-            'object_reference_versioned': '1779/523209/1'
+            'object_reference_versioned': '/'.join([ws_id, obj_id, version])
         }
-        self.assertEqual(ret[0], exp)
+        self.assertDictEqual(ret[0], exp)
 
     def test_get_history(self):
         ret = self.getImpl().get_history(self.getContext(), self.taxon)
         # kt = ret[0][0].pop('type_string')
         # print kt
-        expected = {'object_checksum': u'5f1b24082f447daccca0c8d2f1073fe4',
-                    'object_id': 523209,
+        ws_id, obj_id, version = self.wsClient.get_objects2({'objects': [{'ref': self.taxon}]})['data'][0]['path'][0].split('/')
+        # data saved on ci and appdev have different save date
+        del ret[0][0]['save_date']
+        # 'object_checksum' includes the date the object is saved, this info on ci and appdev are different
+        # needs to be compared particularly
+        if 'ci' in self.wsURL:
+            self.assertEqual(ret[0][0]['object_checksum'],  u'5f1b24082f447daccca0c8d2f1073fe4')
+        elif 'appdev' in self.wsURL:
+            self.assertEqual(ret[0][0]['object_checksum'], u'be965af99c26eb1d8af025f6cd58476b')
+        del ret[0][0]['object_checksum']
+        expected = {'object_id': int(obj_id),
                     'object_metadata': None,
                     'object_name': u'280699_taxon',
-                    'object_reference': '1779/523209',
-                    'object_reference_versioned': '1779/523209/1',
+                    'object_reference': '/'.join([ws_id, obj_id]),
+                    'object_reference_versioned': '/'.join([ws_id, obj_id, version]),
                     'object_size': 455,
-                    'save_date': u'2015-10-08T18:44:34+0000',
                     'saved_by': u'kbasetest',
                     'type_string': u'KBaseGenomeAnnotations.Taxon-1.0',
                     'version': 1,
-                    'workspace_id': 1779,
+                    'workspace_id': int(ws_id),
                     'workspace_name': u'ReferenceTaxons'}
         self.assertEqual(ret[0][0], expected)
 
@@ -216,7 +235,8 @@ class taxon_apiTest(unittest.TestCase):
 
     def test_get_id(self):
         ret = self.getImpl().get_id(self.getContext(), self.taxon)
-        self.assertEqual(ret[0], 523209)
+        ret_ref_id = self.wsClient.get_objects2({'objects': [{'ref': self.taxon}]})['data'][0]['path'][0].split('/')[1]
+        self.assertEqual(ret[0], int(ret_ref_id))
 
     def test_get_name(self):
         ret = self.getImpl().get_name(self.getContext(), self.taxon)
